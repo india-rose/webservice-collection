@@ -1,0 +1,15 @@
+Root uri : /api/v1
+
+Utilisateurs (ErrorCode 1XX)
+	/register : enregistrement d'un utilisateur
+	paramètres requis : login, email, password
+	paramètres optionels : 
+	
+	Code de retour
+		Http 400 => il manque un champs dans la requète
+		Http 200 => {
+			errorCode 100 => Le login est déjà utilisé par un autre utilisateur
+			errorCode 101 => L'email est déjà utilisé par un autre utilisateur
+			pas d'erreur => L'utilisateur a été créé
+		}
+	

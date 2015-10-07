@@ -92,6 +92,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Extensions\RequestExtensions.cs" />
+    <Compile Include="Helpers\RequestResult.cs" />
     <Compile Include="Migrations\201510051518404_Initial.cs" />
     <Compile Include="Migrations\201510051518404_Initial.Designer.cs">
       <DependentUpon>201510051518404_Initial.cs</DependentUpon>

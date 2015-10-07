@@ -21,9 +21,14 @@ namespace WebAPI.Database
 			}
 		}
 
-		public bool UserExists(string login)
+		public bool UserLoginExists(string login)
 		{
 			return _context.Users.Any(x => x.Login == login);
+		}
+
+		public bool UserEmailExists(string email)
+		{
+			return _context.Users.Any(x => x.Email == email);
 		}
 
 		public User GetUserByLogin(string login)
@@ -36,6 +41,7 @@ namespace WebAPI.Database
 			_context.Users.Add(new User
 			{
 				Login = login,
+				//TODO: hash password
 				Password = password
 			});
 			_context.SaveChanges();

@@ -11,6 +11,9 @@ namespace WebAPI.Models
 		[Index]
 		public string Login { get; set; }
 
+		[Index]
+		public string Email { get; set; }
+
 		public string Password { get; set; }
 	}
 }

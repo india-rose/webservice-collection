@@ -5,7 +5,8 @@ namespace WebAPI.Database
 {
 	public interface IDatabaseService : IDisposable
 	{
-		bool UserExists(string login);
+		bool UserLoginExists(string login);
+		bool UserEmailExists(string email);
 		User GetUserByLogin(string login);
 		void RegisterUser(string login, string password);
 	}
