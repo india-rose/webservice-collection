@@ -11,6 +11,8 @@ namespace WebAPI.Models
 		[Index]
 		public long UserId { get; set; }
 
+		public virtual User User { get; set; }
+
 		public long Number { get; set; }
 	}
 }

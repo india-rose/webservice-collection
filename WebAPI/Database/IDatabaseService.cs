@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using WebAPI.Models;
+using WebAPI.ProcessModels;
 
 namespace WebAPI.Database
 {
@@ -25,5 +26,8 @@ namespace WebAPI.Database
 		IEnumerable<Settings> GetSettings(Device device);
 		Settings GetSettings(Device device, long version);
 		Settings CreateSettings(Device device, string settingsData);
+
+		// collection
+		List<IndiagramForDevice> GetIndiagrams(Device device);
 	}
 }

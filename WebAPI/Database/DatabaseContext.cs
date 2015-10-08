@@ -5,7 +5,7 @@ namespace WebAPI.Database
 {
 	public class DatabaseContext : DbContext
 	{
-		public DbSet<Indiagram> Indigrams { get; set; }
+		public DbSet<Indiagram> Indiagrams { get; set; }
 
 		public DbSet<User> Users { get; set; }
 

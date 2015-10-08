@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\DeviceController.cs" />
+    <Compile Include="Controllers\IndiagramController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Database\DatabaseContext.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\IndiagramVersion.cs" />
+    <Compile Include="ProcessModels\IndiagramForDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

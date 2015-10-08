@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Responses\DeviceResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Responses\IndiagramResponse.cs" />
     <Compile Include="Responses\RequestResult.cs" />
     <Compile Include="Responses\SettingsResponse.cs" />
   </ItemGroup>

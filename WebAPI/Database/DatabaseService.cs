@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using WebAPI.Models;
+using WebAPI.ProcessModels;
 
 namespace WebAPI.Database
 {
@@ -136,6 +137,36 @@ namespace WebAPI.Database
 			_context.Settings.Add(newSettings);
 			_context.SaveChanges();
 			return newSettings;
+		}
+
+		#endregion
+
+		#region collection
+
+		public List<IndiagramForDevice> GetIndiagrams(Device device)
+		{
+			List<Indiagram> collections = _context.Indiagrams.Where(x => x.UserId == device.UserId).ToList();
+
+			return collections.Select(x =>
+			{
+				IndiagramInfo info = x.LastIndiagramInfo;
+
+				IndiagramForDevice indiagram = new IndiagramForDevice
+				{
+					Id = x.Id,
+					Version = info.Version,
+					ImagePath = info.ImagePath,
+					IsCategory = info.IsCategory,
+					ParentId = info.ParentId,
+					SoundPath = info.SoundPath,
+					Text = info.Text
+				};
+
+				IndiagramState state = x.States.Where(s => s.DeviceId == device.Id).OrderByDescending(s => s.Version).FirstOrDefault();
+				indiagram.IsEnabled = state == null || state.IsEnabled;
+
+				return indiagram;
+			}).ToList();
 		}
 
 		#endregion

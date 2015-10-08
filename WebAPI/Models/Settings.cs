@@ -11,6 +11,8 @@ namespace WebAPI.Models
 		[Index]
 		public long DeviceId { get; set; }
 
+		public virtual Device Device { get; set; }
+
 		public long VersionNumber { get; set; }
 
 		public string SerializedSettings { get; set; }
