@@ -15,5 +15,15 @@ namespace WebAPI.Extensions
 			}
 			return profile.User;
 		}
+
+		public static Device GetDevice(this HttpRequestContext context)
+		{
+			AuthentificationPrincipal profile = context.Principal as AuthentificationPrincipal;
+			if (profile == null)
+			{
+				return null;
+			}
+			return profile.Device;
+		}
 	}
 }

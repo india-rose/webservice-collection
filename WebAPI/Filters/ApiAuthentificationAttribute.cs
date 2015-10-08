@@ -12,6 +12,13 @@ namespace WebAPI.Filters
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
 	internal sealed class ApiAuthentificationAttribute : Attribute, IAuthenticationFilter
 	{
+		private readonly bool _deviceRequired;
+
+		public ApiAuthentificationAttribute(bool deviceRequired = false)
+		{
+			_deviceRequired = deviceRequired;
+		}
+
 		public async Task AuthenticateAsync(HttpAuthenticationContext context, CancellationToken cancellationToken)
 		{
 			HttpRequestMessage request = context.Request;
@@ -29,7 +36,26 @@ namespace WebAPI.Filters
 			{
 				if (database.CheckAuthentification(login, password))
 				{
-					context.Principal = new AuthentificationPrincipal(database.GetUserByLogin(login), password);
+					AuthentificationPrincipal identity = new AuthentificationPrincipal(database.GetUserByLogin(login), password);
+
+					string deviceName = request.GetHeaderValue("x-indiarose-device");
+					if (!string.IsNullOrWhiteSpace(deviceName))
+					{
+						identity.Device = database.GetDevice(identity.User, deviceName);
+
+						if (identity.Device == null && _deviceRequired)
+						{
+							context.ErrorResult = new AuthenticationFailureResult("Invalid device name", request);
+							return;
+						}
+					}
+					else if (_deviceRequired)
+					{
+						context.ErrorResult = new AuthenticationFailureResult("Missing device name", request);
+						return;
+					}
+
+					context.Principal = identity;
 				}
 				else
 				{

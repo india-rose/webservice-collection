@@ -1,4 +1,4 @@
-﻿namespace WebAPI.Helpers
+﻿namespace WebAPI.Common.Responses
 {
 	public class RequestResult
 	{

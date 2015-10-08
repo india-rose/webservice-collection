@@ -6,10 +6,12 @@ namespace WebAPI.Models
 	public class Settings
 	{
 		[Key]
-		public int Id { get; set; }
+		public long Id { get; set; }
 
 		[Index]
-		public int DeviceId { get; set; }
+		public long DeviceId { get; set; }
+
+		public long VersionNumber { get; set; }
 
 		public string SerializedSettings { get; set; }
 	}

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using WebAPI.Models;
 
 namespace WebAPI.Database
@@ -65,7 +66,7 @@ namespace WebAPI.Database
 
 		public bool HasDevice(User user, string name)
 		{
-			return _context.Devices.Where(x => x.UserId == user.Id).FirstOrDefault(x => x.DeviceName == name) != null;
+			return GetDevice(user, name) != null;
 		}
 
 		public void CreateDevice(User user, string name)
@@ -78,6 +79,66 @@ namespace WebAPI.Database
 			_context.SaveChanges();
 		}
 
+		public Device GetDevice(User user, string name)
+		{
+			return GetDevices(user).FirstOrDefault(x => x.DeviceName == name);
+		}
+
+		public bool UpdateDevice(User user, string oldName, string newName)
+		{
+			Device device = GetDevice(user, oldName);
+
+			if (device == null)
+			{
+				return false;
+			}
+
+			device.DeviceName = newName;
+			_context.SaveChanges();
+			return true;
+		}
+
+		public IEnumerable<Device> GetDevices(User user)
+		{
+			return _context.Devices.Where(x => x.UserId == user.Id);
+		}
+
 		#endregion
+
+		#region settings
+
+		public Settings GetLastSettings(Device device)
+		{
+			return GetSettings(device).OrderByDescending(x => x.VersionNumber).FirstOrDefault();
+		}
+
+		public IEnumerable<Settings> GetSettings(Device device)
+		{
+			return _context.Settings.Where(x => x.DeviceId == device.Id);
+		}
+
+		public Settings GetSettings(Device device, long version)
+		{
+			return GetSettings(device).FirstOrDefault(x => x.VersionNumber == version);
+		}
+
+		public Settings CreateSettings(Device device, string settingsData)
+		{
+			Settings lastSettings = GetLastSettings(device);
+
+			Settings newSettings = new Settings
+			{
+				DeviceId = device.Id,
+				SerializedSettings = settingsData,
+				VersionNumber = (lastSettings == null) ? 1 : lastSettings.VersionNumber + 1
+			};
+
+			_context.Settings.Add(newSettings);
+			_context.SaveChanges();
+			return newSettings;
+		}
+
+		#endregion
+
 	}
 }

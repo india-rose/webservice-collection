@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WebAPI.Models;
 
 namespace WebAPI.Database
@@ -15,5 +16,14 @@ namespace WebAPI.Database
 		// device
 		void CreateDevice(User user, string name);
 		bool HasDevice(User user, string name);
+		Device GetDevice(User user, string name);
+		bool UpdateDevice(User user, string oldName, string newName);
+		IEnumerable<Device> GetDevices(User user);
+
+		// settings
+		Settings GetLastSettings(Device device);
+		IEnumerable<Settings> GetSettings(Device device);
+		Settings GetSettings(Device device, long version);
+		Settings CreateSettings(Device device, string settingsData);
 	}
 }

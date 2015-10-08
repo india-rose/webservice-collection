@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		uri documentation.txt = uri documentation.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI.Common", "WebAPI.Common\WebAPI.Common.csproj", "{FB9DFF28-BD4E-43DC-8893-C86DF6AA7B81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{0F7CF00D-123F-4E27-9CE3-211D3A692346}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F7CF00D-123F-4E27-9CE3-211D3A692346}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F7CF00D-123F-4E27-9CE3-211D3A692346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB9DFF28-BD4E-43DC-8893-C86DF6AA7B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB9DFF28-BD4E-43DC-8893-C86DF6AA7B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB9DFF28-BD4E-43DC-8893-C86DF6AA7B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB9DFF28-BD4E-43DC-8893-C86DF6AA7B81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

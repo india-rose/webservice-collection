@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\DeviceController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Database\DatabaseContext.cs" />
     <Compile Include="Database\DatabaseService.cs" />
@@ -99,7 +100,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Extensions\RequestExtensions.cs" />
-    <Compile Include="Helpers\RequestResult.cs" />
     <Compile Include="Migrations\201510051518404_Initial.cs" />
     <Compile Include="Migrations\201510051518404_Initial.Designer.cs">
       <DependentUpon>201510051518404_Initial.cs</DependentUpon>
@@ -129,6 +129,12 @@
     <EmbeddedResource Include="Migrations\201510051518404_Initial.resx">
       <DependentUpon>201510051518404_Initial.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebAPI.Common\WebAPI.Common.csproj">
+      <Project>{fb9dff28-bd4e-43dc-8893-c86df6aa7b81}</Project>
+      <Name>WebAPI.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

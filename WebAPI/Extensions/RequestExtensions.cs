@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using WebAPI.Helpers;
+using WebAPI.Common.Responses;
 
 namespace WebAPI.Extensions
 {

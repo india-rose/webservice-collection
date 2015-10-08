@@ -22,7 +22,7 @@ namespace WebAPI.Models
 
 		public long Version { get; set; }
 
-		public int ParentId { get; set; }
+		public long ParentId { get; set; }
 
 		public string Text { get; set; }
 
@@ -31,5 +31,22 @@ namespace WebAPI.Models
 		public string ImagePath { get; set; }
 
 		public bool IsCategory { get; set; }
+	}
+
+	public class IndiagramState
+	{
+		[Key]
+		public long Id { get; set; }
+
+		[Index]
+		public long IndiagramId { get; set; }
+
+		[Index]
+		public long DeviceId { get; set; }
+
+		[Index]
+		public long Version { get; set; }
+
+		public bool State { get; set; }
 	}
 }
