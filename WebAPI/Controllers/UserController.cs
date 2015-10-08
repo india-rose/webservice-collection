@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Web.Http;
 using WebAPI.Database;
 using WebAPI.Extensions;
@@ -17,9 +18,22 @@ namespace WebAPI.Controllers
 
 		[Route("login")]
 		[HttpPost]
-		public void Login([FromBody]string login, [FromBody]string password)
+		public HttpResponseMessage Login([FromBody]string login, [FromBody]string password)
 		{
-			
+			if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				if (!database.CheckAuthentification(login, password))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
+				}
+				
+				return Request.CreateEmptyGoodReponse();
+			}
 		}
 
 		[Route("register")]
@@ -28,7 +42,7 @@ namespace WebAPI.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
 			{
-				return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Missing fields in request");
+				return Request.CreateBadRequestResponse();
 			}
 
 			using (IDatabaseService database = new DatabaseService())

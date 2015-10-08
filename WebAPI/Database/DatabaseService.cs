@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using WebAPI.Models;
 
 namespace WebAPI.Database
@@ -21,6 +20,8 @@ namespace WebAPI.Database
 			}
 		}
 
+		#region users
+
 		public bool UserLoginExists(string login)
 		{
 			return _context.Users.Any(x => x.Login == login);
@@ -41,10 +42,42 @@ namespace WebAPI.Database
 			_context.Users.Add(new User
 			{
 				Login = login,
-				//TODO: hash password
-				Password = password
+				Password = password.ToUpperInvariant()
 			});
 			_context.SaveChanges();
 		}
+
+		public bool CheckAuthentification(string login, string password)
+		{
+			User user = GetUserByLogin(login);
+
+			if (user == null)
+			{
+				return false;
+			}
+
+			return user.Password.Equals(password.ToUpperInvariant());
+		}
+
+		#endregion
+
+		#region devices
+
+		public bool HasDevice(User user, string name)
+		{
+			return _context.Devices.Where(x => x.UserId == user.Id).FirstOrDefault(x => x.DeviceName == name) != null;
+		}
+
+		public void CreateDevice(User user, string name)
+		{
+			_context.Devices.Add(new Device
+			{
+				DeviceName = name,
+				UserId = user.Id
+			});
+			_context.SaveChanges();
+		}
+
+		#endregion
 	}
 }

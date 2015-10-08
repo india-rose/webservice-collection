@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using WebAPI.Helpers;
 
@@ -35,6 +37,21 @@ namespace WebAPI.Extensions
 				ErrorCode = 0,
 				ErrorMessage = ""
 			});
+		}
+
+		public static HttpResponseMessage CreateBadRequestResponse(this HttpRequestMessage request)
+		{
+			return request.CreateErrorResponse(HttpStatusCode.BadRequest, "Missing fields in request");
+		}
+
+		public static string GetHeaderValue(this HttpRequestMessage request, string headerName)
+		{
+			IEnumerable<string> resultHeader;
+			if (request.Headers.TryGetValues(headerName, out resultHeader))
+			{
+				return resultHeader.FirstOrDefault();
+			}
+			return null;
 		}
 	}
 }

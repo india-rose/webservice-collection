@@ -1,9 +1,9 @@
 Root uri : /api/v1
 
-Utilisateurs (ErrorCode 1XX)
+Utilisateurs (ErrorCode 1XX) : /users
 	/register : enregistrement d'un utilisateur
-		paramètres requis : login, email, password
-		paramètres optionels : 
+		paramètres requis : login, email, password (sha256 hash)
+		paramètres optionels : <none>
 		
 		Code de retour
 			Http 400 => il manque un champs dans la requète
@@ -12,6 +12,32 @@ Utilisateurs (ErrorCode 1XX)
 				errorCode 101 => L'email est déjà utilisé par un autre utilisateur
 				pas d'erreur => L'utilisateur a été créé
 			}
-			
-	
+	/login : vérifier les informations de login d'un utilisateur
+		paramètre requis : login, password (sha256 hash)
+		paramètres optionels : <none>
+
+		Code de retour
+			Http 400 => il manque un champs dans la requète
+			Http 401 => authentification incorrecte
+			Http 200 => {
+				pas d'erreur => L'utilisateur est loggé
+			}
+
+Toutes les autres requête nécessite de positionner les deux headers suivant : 
+	x-indiarose-login : le login de l'utilisateur
+	x-indiarose-password : le password de l'utilisateur en hash sha256
+
+	Code de retour
+		Http 401 => Authentification incorrecte
+
+Devices (ErrorCode 2XX) : /devices
+	/create : création d'un device
+		paramètre requis : name
+		paramètre optionels : <none>
+
+		Code de retour
+			Http 409 => ce nom existe déjà
+			Http 201 => created
+
+
 	
