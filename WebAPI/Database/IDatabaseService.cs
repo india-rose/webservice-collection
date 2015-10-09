@@ -31,5 +31,8 @@ namespace WebAPI.Database
 		List<IndiagramForDevice> GetIndiagrams(Device device);
 		List<IndiagramForDevice> GetIndiagrams(Device device, long version);
 		bool HasIndiagramVersion(long userId, long version);
+
+		IndiagramInfo GetOrCreateIndiagramInfo(long userId, long indiagramId, long version);
+		void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
 	}
 }

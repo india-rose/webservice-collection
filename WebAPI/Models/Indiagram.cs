@@ -46,7 +46,28 @@ namespace WebAPI.Models
 
 		public string ImagePath { get; set; }
 
+		public string SoundHash { get; set; }
+
+		public string ImageHash { get; set; }
+
 		public bool IsCategory { get; set; }
+
+		public IndiagramInfo Copy()
+		{
+			return new IndiagramInfo
+			{
+				IndiagramId = IndiagramId,
+				Version = Version,
+				ParentId = ParentId,
+				Position = Position,
+				Text = Text,
+				SoundPath = SoundPath,
+				SoundHash = SoundHash,
+				ImagePath = ImagePath,
+				ImageHash = ImageHash,
+				IsCategory = IsCategory
+			};
+		}
 	}
 
 	public class IndiagramState

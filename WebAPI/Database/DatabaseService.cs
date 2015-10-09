@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Web.UI;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
 
@@ -195,6 +197,46 @@ namespace WebAPI.Database
 		public bool HasIndiagramVersion(long userId, long version)
 		{
 			return _context.Versions.FirstOrDefault(x => x.UserId == userId) != null;
+		}
+
+		public IndiagramInfo GetOrCreateIndiagramInfo(long userId, long indiagramId, long version)
+		{
+			Indiagram indiagram = _context.Indiagrams.FirstOrDefault(x => x.UserId == userId && x.Id == indiagramId);
+			if (indiagram == null)
+			{
+				return null;
+			}
+
+			IndiagramInfo info = indiagram.LastIndiagramInfo;
+			if (info.Version > version)
+			{
+				return null; // can not modify old versions
+			}
+
+			if (info.Version < version)
+			{
+				// create the IndiagramInfo object for version based on the last one
+				info = info.Copy();
+				info.Version = version;
+			}
+
+			return info;
+		}
+
+		public void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent)
+		{
+			indiagramInfo.ImagePath = filename;
+			indiagramInfo.ImageHash = ComputeFileHash(fileContent);
+		}
+
+		private string ComputeFileHash(byte[] content)
+		{
+			using (SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider())
+			{
+				byte[] hash = sha1.ComputeHash(content);
+				string hex = BitConverter.ToString(hash);
+				return hex.Replace("-", "").ToUpperInvariant();
+			}
 		}
 
 		#endregion

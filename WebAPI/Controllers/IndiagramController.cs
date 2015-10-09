@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
@@ -130,6 +131,63 @@ namespace WebAPI.Controllers
 		public HttpResponseMessage CreateIndiagram([FromBody] string indiagramText)
 		{
 			throw new NotImplementedException();
+		}
+
+		[Route("image/{id}/{versionNumber}")]
+		[HttpPost]
+		public async Task<HttpResponseMessage> PostImage([FromUri] string id, [FromUri] string versionNumber)
+		{
+			if (!Request.Content.IsMimeMultipartContent())
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			MultipartMemoryStreamProvider provider = new MultipartMemoryStreamProvider();
+			await Request.Content.ReadAsMultipartAsync(provider);
+
+			if (provider.Contents.Count != 1)
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				User user = RequestContext.GetAuthenticatedUser();
+				long indiagramId;
+				long version;
+
+				if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+				{
+					return Request.CreateBadRequestResponse();
+				}
+
+				if (!database.HasIndiagramVersion(user.Id, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				IndiagramInfo indiagramInfo = database.GetOrCreateIndiagramInfo(user.Id, indiagramId, version);
+
+				if (indiagramInfo == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				HttpContent file = provider.Contents.First();
+				string filename = file.Headers.ContentDisposition.FileName.Trim('\"');
+				byte[] buffer = await file.ReadAsByteArrayAsync();
+
+				IStorageService storageService = new StorageService();
+				string storageFilename = storageService.UploadImage(filename, buffer);
+
+				if (string.IsNullOrWhiteSpace(storageFilename))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Image already exists for this indiagram");
+				}
+				database.SetIndiagramImage(indiagramInfo, storageFilename, buffer);
+			}
+
+			return Request.CreateEmptyGoodReponse();
 		}
 
 		private List<IndiagramResponse> GetCollectionTree(List<IndiagramForDevice> indiagrams)

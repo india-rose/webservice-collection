@@ -128,3 +128,4 @@ Collection (ErrorCode 4XX) : /collection
 
 
 TODO : implement image/sound file hash to update only when needed
+TODO : add support for forbidden result when user is not the correct one

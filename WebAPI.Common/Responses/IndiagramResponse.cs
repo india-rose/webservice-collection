@@ -8,9 +8,13 @@ namespace WebAPI.Common.Responses
 
 		public string Text { get; set; }
 
-		public string ImagePath { get; set; }
+		public bool HasImage { get; set; }
 
-		public string SoundPath { get; set; }
+		public bool HasSound { get; set; }
+
+		public string ImageHash { get; set; }
+
+		public string SoundHash { get; set; }
 
 		public int Position { get; set; }
 
