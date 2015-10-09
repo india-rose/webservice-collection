@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Models
@@ -14,6 +15,8 @@ namespace WebAPI.Models
 		public virtual Device Device { get; set; }
 
 		public long VersionNumber { get; set; }
+
+		public DateTime Date { get; set; }
 
 		public string SerializedSettings { get; set; }
 	}

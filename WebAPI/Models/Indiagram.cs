@@ -38,6 +38,8 @@ namespace WebAPI.Models
 
 		public long ParentId { get; set; }
 
+		public int Position { get; set; }
+
 		public string Text { get; set; }
 
 		public string SoundPath { get; set; }

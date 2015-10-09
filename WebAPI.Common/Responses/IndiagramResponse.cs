@@ -12,6 +12,8 @@ namespace WebAPI.Common.Responses
 
 		public string SoundPath { get; set; }
 
+		public int Position { get; set; }
+
 		public bool IsEnabled { get; set; }
 
 		public bool IsCategory { get; set; }

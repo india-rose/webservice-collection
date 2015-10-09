@@ -29,5 +29,7 @@ namespace WebAPI.Database
 
 		// collection
 		List<IndiagramForDevice> GetIndiagrams(Device device);
+		List<IndiagramForDevice> GetIndiagrams(Device device, long version);
+		bool HasIndiagramVersion(long userId, long version);
 	}
 }

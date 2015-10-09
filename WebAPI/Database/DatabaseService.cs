@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
@@ -131,7 +132,8 @@ namespace WebAPI.Database
 			{
 				DeviceId = device.Id,
 				SerializedSettings = settingsData,
-				VersionNumber = (lastSettings == null) ? 1 : lastSettings.VersionNumber + 1
+				VersionNumber = (lastSettings == null) ? 1 : lastSettings.VersionNumber + 1,
+				Date = DateTime.Now
 			};
 
 			_context.Settings.Add(newSettings);
@@ -143,30 +145,56 @@ namespace WebAPI.Database
 
 		#region collection
 
+		private List<Indiagram> GetIndiagramsUser(long userId)
+		{
+			return _context.Indiagrams.Where(x => x.UserId == userId).ToList();
+		}
+
 		public List<IndiagramForDevice> GetIndiagrams(Device device)
 		{
-			List<Indiagram> collections = _context.Indiagrams.Where(x => x.UserId == device.UserId).ToList();
+			List<Indiagram> collections = GetIndiagramsUser(device.UserId);
 
 			return collections.Select(x =>
 			{
 				IndiagramInfo info = x.LastIndiagramInfo;
-
-				IndiagramForDevice indiagram = new IndiagramForDevice
-				{
-					Id = x.Id,
-					Version = info.Version,
-					ImagePath = info.ImagePath,
-					IsCategory = info.IsCategory,
-					ParentId = info.ParentId,
-					SoundPath = info.SoundPath,
-					Text = info.Text
-				};
-
 				IndiagramState state = x.States.Where(s => s.DeviceId == device.Id).OrderByDescending(s => s.Version).FirstOrDefault();
-				indiagram.IsEnabled = state == null || state.IsEnabled;
 
-				return indiagram;
-			}).ToList();
+				return ToIndiagramForDevice(x, info, state);
+			}).OrderBy(x => x.Position).ToList();
+		}
+
+		public List<IndiagramForDevice> GetIndiagrams(Device device, long version)
+		{
+			List<Indiagram> collections = GetIndiagramsUser(device.UserId);
+
+			return collections.Select(x =>
+			{
+				IndiagramInfo info = x.Infos.OrderByDescending(item => item.Version).First(item => item.Version <= version);
+				IndiagramState state = x.States.Where(s => s.DeviceId == device.Id).OrderByDescending(s => s.Version).FirstOrDefault(s => s.Version <= version);
+
+				return ToIndiagramForDevice(x, info, state);
+			}).OrderBy(x => x.Position).ToList();
+		}
+
+		private IndiagramForDevice ToIndiagramForDevice(Indiagram indiagram, IndiagramInfo info, IndiagramState state)
+		{
+			return new IndiagramForDevice
+			{
+				Id = indiagram.Id,
+				Version = info.Version,
+				ImagePath = info.ImagePath,
+				IsCategory = info.IsCategory,
+				ParentId = info.ParentId,
+				SoundPath = info.SoundPath,
+				Text = info.Text,
+				Position = info.Position,
+				IsEnabled = state == null || state.IsEnabled
+			};
+		}
+
+		public bool HasIndiagramVersion(long userId, long version)
+		{
+			return _context.Versions.FirstOrDefault(x => x.UserId == userId) != null;
 		}
 
 		#endregion

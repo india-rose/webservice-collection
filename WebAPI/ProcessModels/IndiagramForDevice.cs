@@ -14,6 +14,8 @@
 
 		public string ImagePath { get; set; }
 
+		public int Position { get; set; }
+
 		public bool IsCategory { get; set; }
 
 		public bool IsEnabled { get; set; }

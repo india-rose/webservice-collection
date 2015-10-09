@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No settings synced");
 				}
-				return Request.CreateGoodReponse(new SettingsResponse(settings.SerializedSettings, settings.VersionNumber));
+				return Request.CreateGoodReponse(new SettingsResponse(settings.SerializedSettings, settings.VersionNumber, settings.Date));
 			}
 		}
 
@@ -49,7 +49,7 @@ namespace WebAPI.Controllers
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Error while saving the new settings");
 				}
-				return Request.CreateGoodReponse(new SettingsResponse(settings.SerializedSettings, settings.VersionNumber));
+				return Request.CreateGoodReponse(new SettingsResponse(settings.SerializedSettings, settings.VersionNumber, settings.Date));
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace WebAPI.Controllers
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version of settings not found");
 				}
-				return Request.CreateGoodReponse(new SettingsResponse(settings.SerializedSettings, settings.VersionNumber));
+				return Request.CreateGoodReponse(new SettingsResponse(settings.SerializedSettings, settings.VersionNumber, settings.Date));
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				Device device = RequestContext.GetDevice();
-				return Request.CreateGoodReponse(database.GetSettings(device).Select(x => new SettingsResponse(x.SerializedSettings, x.VersionNumber)).ToList());
+				return Request.CreateGoodReponse(database.GetSettings(device).Select(x => new SettingsResponse(x.SerializedSettings, x.VersionNumber, x.Date)).ToList());
 			}
 		}
 	}

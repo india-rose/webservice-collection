@@ -104,3 +104,27 @@ Settings (ErrorCode 3XX) : /settings
 				pas d'erreur => List<SettingsResponse> dans le Content de la réponse
 			}
 
+Collection (ErrorCode 4XX) : /collection
+	GET /all : récupère toute la collection dans sa dernière version pour ce device
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour
+			Http 200 => {
+				pas d'erreur => List<IndiagramResponse> dans le Content de la réponse
+			}
+
+	Get /all/{versionNumber} : récupère toute la collection dans une version particulière pour ce device
+		paramètre requis : versionNumber (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => versionNumber n'est pas un numéro
+			Http 404 (Not found) => versionNumbre ne correspond pas à une version existante
+			Http 200 => {
+				pas d'erreur => List<IndiagramResponse> dans le Content de la réponse
+			}
+
+
+
+TODO : implement image/sound file hash to update only when needed
