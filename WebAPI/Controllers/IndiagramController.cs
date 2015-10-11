@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
 using WebAPI.Extensions;
 using WebAPI.Filters;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
+using Version = WebAPI.Models.Version;
 
 namespace WebAPI.Controllers
 {
@@ -65,14 +68,49 @@ namespace WebAPI.Controllers
 		[HttpGet]
 		public HttpResponseMessage Indiagram([FromUri] string id)
 		{
-			throw new NotImplementedException();
+			long indiagramId;
+			Device device = RequestContext.GetDevice();
+			if (!long.TryParse(id, out indiagramId))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId);
+
+				if (resultIndiagram == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				return Request.CreateGoodReponse(ToResponse(resultIndiagram));
+			}
 		}
 
 		[Route("indiagram/{id}/{versionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Indiagram([FromUri] string id, [FromUri] string versionNumber)
 		{
-			throw new NotImplementedException();
+			long indiagramId;
+			long version;
+			Device device = RequestContext.GetDevice();
+			if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId, version);
+
+				if (resultIndiagram == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				return Request.CreateGoodReponse(ToResponse(resultIndiagram));
+			}
 		}
 
 		[Route("image/{id}")]
@@ -107,14 +145,30 @@ namespace WebAPI.Controllers
 		[HttpGet]
 		public HttpResponseMessage Versions()
 		{
-			throw new NotImplementedException();
+			User user = RequestContext.GetAuthenticatedUser();
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				return Request.CreateGoodReponse(database.GetVersions(user.Id).Select(x => ToResponse(x)));
+			}
 		}
 
 		[Route("versions/{fromVersionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Versions([FromUri] string fromVersionNumber)
 		{
-			throw new NotImplementedException();
+			long fromVersion;
+			if (!long.TryParse(fromVersionNumber, out fromVersion))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			User user = RequestContext.GetAuthenticatedUser();
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				return Request.CreateGoodReponse(database.GetVersions(user.Id).Select(x => ToResponse(x)));
+			}
 		}
 
 		#endregion
@@ -123,19 +177,77 @@ namespace WebAPI.Controllers
 		[HttpPost]
 		public HttpResponseMessage CreateVersion()
 		{
-			throw new NotImplementedException();
+			User user = RequestContext.GetAuthenticatedUser();
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				Version version = database.CreateVersion(user.Id);
+
+				return Request.CreateGoodReponse(ToResponse(version));
+			}
 		}
 
-		[Route("create/indiagram")]
+		[Route("update/indiagram")]
 		[HttpPost]
-		public HttpResponseMessage CreateIndiagram([FromBody] string indiagramText)
+		public HttpResponseMessage CreateIndiagram([FromBody] IndiagramRequest request)
 		{
-			throw new NotImplementedException();
+			if (request == null || string.IsNullOrWhiteSpace(request.Text))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				//TODO : call create only if request.Id < 0
+				Device device = RequestContext.GetDevice();
+				if (request.Id < 0)
+				{
+					Indiagram indiagram = database.CreateIndiagram(device.UserId, device.Id, request);
+					return Request.CreateGoodReponse(database.GetIndiagram(device, indiagram.Id));
+				}
+				else
+				{
+					//TODO
+					throw new NotImplementedException();
+				}
+			}
 		}
 
 		[Route("image/{id}/{versionNumber}")]
 		[HttpPost]
 		public async Task<HttpResponseMessage> PostImage([FromUri] string id, [FromUri] string versionNumber)
+		{
+			return await PostFile(id, versionNumber, (database, indiagramInfo, filename, buffer) =>
+			{
+				IStorageService storageService = new StorageService();
+				if (!storageService.UploadImage(indiagramInfo, buffer))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Indiagram image already exists and can't be replaced");
+				}
+
+				database.SetIndiagramImage(indiagramInfo, filename, buffer);
+				return Request.CreateEmptyGoodReponse();
+			});
+		}
+
+		[Route("sound/{id}/{versionNumber}")]
+		[HttpPost]
+		public async Task<HttpResponseMessage> PostSound([FromUri] string id, [FromUri] string versionNumber)
+		{
+			return await PostFile(id, versionNumber, (database, indiagramInfo, filename, buffer) =>
+			{
+				IStorageService storageService = new StorageService();
+				if (!storageService.UploadSound(indiagramInfo, buffer))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Indiagram sound already exists and can't be replaced");
+				}
+
+				database.SetIndiagramSound(indiagramInfo, filename, buffer);
+				return Request.CreateEmptyGoodReponse();
+			});
+		}
+
+		private async Task<HttpResponseMessage> PostFile(string id, string versionNumber, Func<IDatabaseService, IndiagramInfo, string, byte[], HttpResponseMessage> processFile)
 		{
 			if (!Request.Content.IsMimeMultipartContent())
 			{
@@ -177,17 +289,8 @@ namespace WebAPI.Controllers
 				string filename = file.Headers.ContentDisposition.FileName.Trim('\"');
 				byte[] buffer = await file.ReadAsByteArrayAsync();
 
-				IStorageService storageService = new StorageService();
-				string storageFilename = storageService.UploadImage(filename, buffer);
-
-				if (string.IsNullOrWhiteSpace(storageFilename))
-				{
-					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Image already exists for this indiagram");
-				}
-				database.SetIndiagramImage(indiagramInfo, storageFilename, buffer);
+				return processFile(database, indiagramInfo, filename, buffer);
 			}
-
-			return Request.CreateEmptyGoodReponse();
 		}
 
 		private List<IndiagramResponse> GetCollectionTree(List<IndiagramForDevice> indiagrams)
@@ -224,12 +327,17 @@ namespace WebAPI.Controllers
 			{
 				DatabaseId = indiagram.Id,
 				IsEnabled = indiagram.IsEnabled,
-				ImagePath = indiagram.ImagePath,
+				ImageHash = indiagram.ImageHash,
 				IsCategory = indiagram.IsCategory,
-				SoundPath = indiagram.SoundPath,
+				SoundHash = indiagram.SoundHash,
 				Text = indiagram.Text,
 				Position = indiagram.Position
 			};
+		}
+
+		private VersionResponse ToResponse(Version version)
+		{
+			return new VersionResponse(version.Number, version.Date);
 		}
 	}
 }

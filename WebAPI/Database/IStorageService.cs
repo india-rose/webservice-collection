@@ -1,7 +1,11 @@
-﻿namespace WebAPI.Database
+﻿using WebAPI.Models;
+
+namespace WebAPI.Database
 {
 	public interface IStorageService
 	{
-		string UploadImage(string filename, byte[] fileBuffer);
+		bool UploadImage(IndiagramInfo indiagram, byte[] fileBuffer);
+
+		bool UploadSound(IndiagramInfo indiagram, byte[] fileBuffer);
 	}
 }

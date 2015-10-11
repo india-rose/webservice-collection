@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Database;
 
 namespace WebAPI.Models
 {
@@ -20,8 +21,6 @@ namespace WebAPI.Models
 		public virtual IndiagramInfo LastIndiagramInfo { get; set; } 
 
 		public virtual List<IndiagramInfo> Infos { get; set; }
-
-		public virtual List<IndiagramState> States { get; set; } 
 	}
 
 	public class IndiagramInfo
@@ -31,6 +30,8 @@ namespace WebAPI.Models
 
 		[Index]
 		public long IndiagramId { get; set; }
+
+		public virtual List<IndiagramState> States { get; set; } 
 
 		public virtual Indiagram Indiagram { get; set; }
 
@@ -51,23 +52,6 @@ namespace WebAPI.Models
 		public string ImageHash { get; set; }
 
 		public bool IsCategory { get; set; }
-
-		public IndiagramInfo Copy()
-		{
-			return new IndiagramInfo
-			{
-				IndiagramId = IndiagramId,
-				Version = Version,
-				ParentId = ParentId,
-				Position = Position,
-				Text = Text,
-				SoundPath = SoundPath,
-				SoundHash = SoundHash,
-				ImagePath = ImagePath,
-				ImageHash = ImageHash,
-				IsCategory = IsCategory
-			};
-		}
 	}
 
 	public class IndiagramState
@@ -76,17 +60,14 @@ namespace WebAPI.Models
 		public long Id { get; set; }
 
 		[Index]
-		public long IndiagramId { get; set; }
+		public long IndiagramInfoId { get; set; }
 
-		public virtual Indiagram Indiagram { get; set; }
+		public virtual IndiagramInfo IndiagramInfo { get; set; }
 
 		[Index]
 		public long DeviceId { get; set; }
 
 		public virtual Device Device { get; set; }
-
-		[Index]
-		public long Version { get; set; }
 
 		public bool IsEnabled { get; set; }
 	}

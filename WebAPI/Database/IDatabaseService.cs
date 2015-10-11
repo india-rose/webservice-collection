@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using WebAPI.Common.Requests;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
+using Version = WebAPI.Models.Version;
 
 namespace WebAPI.Database
 {
@@ -30,9 +32,17 @@ namespace WebAPI.Database
 		// collection
 		List<IndiagramForDevice> GetIndiagrams(Device device);
 		List<IndiagramForDevice> GetIndiagrams(Device device, long version);
-		bool HasIndiagramVersion(long userId, long version);
-
+		IndiagramForDevice GetIndiagram(Device device, long id);
+		IndiagramForDevice GetIndiagram(Device device, long id, long version);
 		IndiagramInfo GetOrCreateIndiagramInfo(long userId, long indiagramId, long version);
 		void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
+		void SetIndiagramSound(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
+		Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest indiagram);
+
+		// collection versions
+		bool HasIndiagramVersion(long userId, long version);
+		Version CreateVersion(long userId);
+		List<Version> GetVersions(long userId);
+		List<Version> GetVersions(long userId, long startVersion);
 	}
 }

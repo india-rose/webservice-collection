@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Web.UI;
+using WebAPI.Common.Requests;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
+using Version = WebAPI.Models.Version;
 
 namespace WebAPI.Database
 {
@@ -147,35 +149,52 @@ namespace WebAPI.Database
 
 		#region collection
 
-		private List<Indiagram> GetIndiagramsUser(long userId)
+		private IEnumerable<Indiagram> GetIndiagramsUser(long userId)
 		{
-			return _context.Indiagrams.Where(x => x.UserId == userId).ToList();
+			return _context.Indiagrams.Where(x => x.UserId == userId);
+		}
+
+		private Indiagram GetIndiagramUser(long userId, long indiagramId)
+		{
+			return _context.Indiagrams.FirstOrDefault(x => x.UserId == userId && x.Id == indiagramId);
+		}
+
+		private IndiagramForDevice CreateIndiagramForDevice(Device device, Indiagram indiagram)
+		{
+			IndiagramInfo info = indiagram.LastIndiagramInfo;
+			IndiagramState state = info.States.FirstOrDefault(s => s.DeviceId == device.Id);
+
+			return ToIndiagramForDevice(indiagram, info, state);
+		}
+
+		private IndiagramForDevice CreateIndiagramForDevice(Device device, Indiagram indiagram, long version)
+		{
+			IndiagramInfo info = indiagram.Infos.OrderByDescending(item => item.Version).First(item => item.Version <= version);
+			IndiagramState state = info.States.FirstOrDefault(s => s.DeviceId == device.Id);
+
+			return ToIndiagramForDevice(indiagram, info, state);
 		}
 
 		public List<IndiagramForDevice> GetIndiagrams(Device device)
 		{
-			List<Indiagram> collections = GetIndiagramsUser(device.UserId);
-
-			return collections.Select(x =>
-			{
-				IndiagramInfo info = x.LastIndiagramInfo;
-				IndiagramState state = x.States.Where(s => s.DeviceId == device.Id).OrderByDescending(s => s.Version).FirstOrDefault();
-
-				return ToIndiagramForDevice(x, info, state);
-			}).OrderBy(x => x.Position).ToList();
+			return GetIndiagramsUser(device.UserId).Select(x => CreateIndiagramForDevice(device, x)).OrderBy(x => x.Position).ToList();
 		}
 
 		public List<IndiagramForDevice> GetIndiagrams(Device device, long version)
 		{
-			List<Indiagram> collections = GetIndiagramsUser(device.UserId);
+			return GetIndiagramsUser(device.UserId).Select(x => CreateIndiagramForDevice(device, x, version)).OrderBy(x => x.Position).ToList();
+		}
 
-			return collections.Select(x =>
-			{
-				IndiagramInfo info = x.Infos.OrderByDescending(item => item.Version).First(item => item.Version <= version);
-				IndiagramState state = x.States.Where(s => s.DeviceId == device.Id).OrderByDescending(s => s.Version).FirstOrDefault(s => s.Version <= version);
+		public IndiagramForDevice GetIndiagram(Device device, long id)
+		{
+			Indiagram indiagram = GetIndiagramUser(device.UserId, id);
+			return indiagram == null ? null : CreateIndiagramForDevice(device, indiagram);
+		}
 
-				return ToIndiagramForDevice(x, info, state);
-			}).OrderBy(x => x.Position).ToList();
+		public IndiagramForDevice GetIndiagram(Device device, long id, long version)
+		{
+			Indiagram indiagram = GetIndiagramUser(device.UserId, id);
+			return indiagram == null ? null : CreateIndiagramForDevice(device, indiagram, version);
 		}
 
 		private IndiagramForDevice ToIndiagramForDevice(Indiagram indiagram, IndiagramInfo info, IndiagramState state)
@@ -184,19 +203,48 @@ namespace WebAPI.Database
 			{
 				Id = indiagram.Id,
 				Version = info.Version,
-				ImagePath = info.ImagePath,
+				ImageHash = info.ImageHash,
 				IsCategory = info.IsCategory,
 				ParentId = info.ParentId,
-				SoundPath = info.SoundPath,
+				SoundHash = info.SoundHash,
 				Text = info.Text,
 				Position = info.Position,
 				IsEnabled = state == null || state.IsEnabled
 			};
 		}
 
-		public bool HasIndiagramVersion(long userId, long version)
+		public Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest indiagram)
 		{
-			return _context.Versions.FirstOrDefault(x => x.UserId == userId) != null;
+			Indiagram result = _context.Indiagrams.Add(new Indiagram
+			{
+				UserId = userId,
+			});
+
+			IndiagramInfo info = _context.Set<IndiagramInfo>().Add(new IndiagramInfo
+			{
+				//TODO : check if id is set when add is done are we need to call saveChanges
+				IndiagramId = result.Id,
+				IsCategory = indiagram.IsCategory,
+				ParentId = indiagram.ParentId,
+				Position = indiagram.Position,
+				Text = indiagram.Text,
+			});
+
+			result.Infos = new List<IndiagramInfo>{ info };
+			result.LastIndiagramInfo = info;
+			result.LastIndiagramInfoId = info.Id;
+
+			IndiagramState state = _context.Set<IndiagramState>().Add(new IndiagramState
+			{
+				DeviceId = deviceId,
+				IndiagramInfoId = info.Id,
+				IsEnabled = indiagram.IsEnabled
+			});
+
+			info.States = new List<IndiagramState> {state};
+
+			_context.SaveChanges();
+			return result;
 		}
 
 		public IndiagramInfo GetOrCreateIndiagramInfo(long userId, long indiagramId, long version)
@@ -208,16 +256,53 @@ namespace WebAPI.Database
 			}
 
 			IndiagramInfo info = indiagram.LastIndiagramInfo;
-			if (info.Version > version)
+			if (info == null)
+			{
+				// create the IndiagramInfo object for version based on the last one
+				info = new IndiagramInfo
+				{
+					IndiagramId = indiagram.Id,
+					Version = version,
+					ParentId = -1,
+				};
+
+				info = _context.Set<IndiagramInfo>().Add(info);
+				_context.SaveChanges();
+			}
+			else if (info.Version > version)
 			{
 				return null; // can not modify old versions
 			}
-
-			if (info.Version < version)
+			else if (info.Version < version)
 			{
 				// create the IndiagramInfo object for version based on the last one
-				info = info.Copy();
-				info.Version = version;
+				IndiagramInfo old = info;
+				info = new IndiagramInfo
+				{
+					IndiagramId = indiagram.Id,
+					Version = version,
+					ParentId = old.ParentId,
+					Position = old.Position,
+					Text = old.Text,
+					SoundPath = old.SoundPath,
+					SoundHash = old.SoundHash,
+					ImagePath = old.ImagePath,
+					ImageHash = old.ImageHash,
+					IsCategory = old.IsCategory,
+				};
+				
+				info = _context.Set<IndiagramInfo>().Add(info);
+				DbSet<IndiagramState> stateSet = _context.Set<IndiagramState>();
+
+				info.States = old.States.Select(x => stateSet.Add(
+					new IndiagramState
+					{
+						DeviceId = x.DeviceId,
+						IndiagramInfoId = info.Id,
+						IsEnabled = x.IsEnabled
+					})).ToList();
+
+				_context.SaveChanges();
 			}
 
 			return info;
@@ -227,6 +312,14 @@ namespace WebAPI.Database
 		{
 			indiagramInfo.ImagePath = filename;
 			indiagramInfo.ImageHash = ComputeFileHash(fileContent);
+			_context.SaveChanges();
+		}
+
+		public void SetIndiagramSound(IndiagramInfo indiagramInfo, string filename, byte[] fileContent)
+		{
+			indiagramInfo.SoundPath = filename;
+			indiagramInfo.SoundHash = ComputeFileHash(fileContent);
+			_context.SaveChanges();
 		}
 
 		private string ComputeFileHash(byte[] content)
@@ -241,5 +334,41 @@ namespace WebAPI.Database
 
 		#endregion
 
+		#region collection versions
+
+		public Version CreateVersion(long userId)
+		{
+			long lastVersion = 1;
+			if (_context.Versions.Any(x => x.UserId == userId))
+			{
+				lastVersion = _context.Versions.Where(x => x.UserId == userId).Max(x => x.Number);
+			}
+
+			Version version = _context.Versions.Add(new Version
+			{
+				Date = DateTime.Now,
+				Number = lastVersion,
+				UserId = userId
+			});
+			_context.SaveChanges();
+			return version;
+		}
+
+		public bool HasIndiagramVersion(long userId, long version)
+		{
+			return _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version) != null;
+		}
+
+		public List<Version> GetVersions(long userId)
+		{
+			return _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).ToList();
+		}
+
+		public List<Version> GetVersions(long userId, long startVersion)
+		{
+			return _context.Versions.Where(x => x.UserId == userId && x.Number > startVersion).OrderByDescending(x => x.Number).ToList();
+		}
+
+		#endregion
 	}
 }

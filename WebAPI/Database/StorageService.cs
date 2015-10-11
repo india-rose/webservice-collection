@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using WebAPI.Models;
 
 namespace WebAPI.Database
 {
@@ -23,10 +22,38 @@ namespace WebAPI.Database
 			_blobClient = storageAccount.CreateCloudBlobClient();
 		}
 
-		public string UploadImage(string filename, byte[] fileBuffer)
+		private bool UploadFile(IndiagramInfo indiagram, byte[] fileBuffer, string containerName)
 		{
-			CloudBlobContainer imageContainer = _blobClient.GetContainerReference(IMAGES_CONTAINER);
-			
+			try
+			{
+				CloudBlobContainer container = _blobClient.GetContainerReference(containerName);
+				container.CreateIfNotExists(BlobContainerPublicAccessType.Container);
+
+				string filename = string.Format("{0}_{1}", indiagram.IndiagramId, indiagram.Version);
+
+				if (container.ListBlobs(filename).Any())
+				{
+					return false;
+				}
+				CloudBlockBlob blob = container.GetBlockBlobReference(filename);
+				blob.UploadFromByteArray(fileBuffer, 0, fileBuffer.Length);
+			}
+			catch (Exception e)
+			{
+				Trace.TraceError("Exception while uploading file to container {0} : {1}\n{2}", containerName, e.Message, e.StackTrace);
+				return false;
+			}
+			return true;
+		}
+
+		public bool UploadSound(IndiagramInfo indiagram, byte[] fileBuffer)
+		{
+			return UploadFile(indiagram, fileBuffer, SOUNDS_CONTAINER);
+		}
+
+		public bool UploadImage(IndiagramInfo indiagram, byte[] fileBuffer)
+		{
+			return UploadFile(indiagram, fileBuffer, IMAGES_CONTAINER);
 		}
 	}
 }
