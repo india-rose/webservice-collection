@@ -44,11 +44,12 @@ namespace WebAPI.Database
 			return _context.Users.FirstOrDefault(x => x.Login == login);
 		}
 
-		public void RegisterUser(string login, string password)
+		public void RegisterUser(string login, string email, string password)
 		{
 			_context.Users.Add(new User
 			{
 				Login = login,
+				Email = email,
 				Password = password.ToUpperInvariant()
 			});
 			_context.SaveChanges();

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using WebAPI.Database;
 
 namespace WebAPI.Models
 {
+	[Table("Indiagrams")]
 	public class Indiagram
 	{
 		[Key]
@@ -15,14 +17,16 @@ namespace WebAPI.Models
 
 		public virtual User User { get; set; }
 
-		[ForeignKey("LastIndiagramInfo")]
-		public long LastIndiagramInfoId { get; set; }
+		public long? LastIndiagramInfoId { get; set; }
 
-		public virtual IndiagramInfo LastIndiagramInfo { get; set; } 
+		[ForeignKey("LastIndiagramInfoId")]
+		public virtual IndiagramInfo LastIndiagramInfo { get; set; }
 
+		[InverseProperty("Indiagram")]
 		public virtual List<IndiagramInfo> Infos { get; set; }
 	}
 
+	[Table("IndiagramInfos")]
 	public class IndiagramInfo
 	{
 		[Key]
@@ -31,6 +35,7 @@ namespace WebAPI.Models
 		[Index]
 		public long IndiagramId { get; set; }
 
+		[InverseProperty("IndiagramInfo")]
 		public virtual List<IndiagramState> States { get; set; } 
 
 		public virtual Indiagram Indiagram { get; set; }
@@ -54,13 +59,14 @@ namespace WebAPI.Models
 		public bool IsCategory { get; set; }
 	}
 
+	[Table("IndiagramStates")]
 	public class IndiagramState
 	{
 		[Key]
 		public long Id { get; set; }
 
 		[Index]
-		public long IndiagramInfoId { get; set; }
+		public long? IndiagramInfoId { get; set; }
 
 		public virtual IndiagramInfo IndiagramInfo { get; set; }
 

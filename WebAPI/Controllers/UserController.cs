@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Web.Http;
+using WebAPI.Common.Requests;
 using WebAPI.Database;
 using WebAPI.Extensions;
 
@@ -18,16 +18,16 @@ namespace WebAPI.Controllers
 
 		[Route("login")]
 		[HttpPost]
-		public HttpResponseMessage Login([FromBody]string login, [FromBody]string password)
+		public HttpResponseMessage Login([FromBody] UserLoginRequest userInfo)
 		{
-			if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+			if (string.IsNullOrWhiteSpace(userInfo.Login) || string.IsNullOrWhiteSpace(userInfo.Password))
 			{
 				return Request.CreateBadRequestResponse();
 			}
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				if (!database.CheckAuthentification(login, password))
+				if (!database.CheckAuthentification(userInfo.Login, userInfo.Password))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Invalid credentials");
 				}
@@ -38,25 +38,25 @@ namespace WebAPI.Controllers
 
 		[Route("register")]
 		[HttpPost]
-		public HttpResponseMessage Register([FromBody]string login, [FromBody]string email, [FromBody]string password)
+		public HttpResponseMessage Register([FromBody] UserRegisterRequest userInfo)
 		{
-			if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+			if (string.IsNullOrWhiteSpace(userInfo.Login) || string.IsNullOrWhiteSpace(userInfo.Email) || string.IsNullOrWhiteSpace(userInfo.Password))
 			{
 				return Request.CreateBadRequestResponse();
 			}
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				if (database.UserLoginExists(login))
+				if (database.UserLoginExists(userInfo.Login))
 				{
 					return Request.CreateCustomError(ERROR_CODE_LOGIN_EXISTS, ERROR_TEXT_LOGIN_EXISTS);
 				}
-				if (database.UserEmailExists(email))
+				if (database.UserEmailExists(userInfo.Email))
 				{
 					return Request.CreateCustomError(ERROR_CODE_EMAIL_EXISTS, ERROR_TEXT_EMAIL_EXISTS);
 				}
 				
-				database.RegisterUser(login, password);
+				database.RegisterUser(userInfo.Login, userInfo.Email, userInfo.Password);
 				return Request.CreateEmptyGoodReponse();
 			}
 		}

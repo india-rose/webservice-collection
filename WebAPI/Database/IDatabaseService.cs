@@ -13,7 +13,7 @@ namespace WebAPI.Database
 		bool UserLoginExists(string login);
 		bool UserEmailExists(string email);
 		User GetUserByLogin(string login);
-		void RegisterUser(string login, string password);
+		void RegisterUser(string login, string email, string password);
 		bool CheckAuthentification(string login, string password);
 		
 		// device

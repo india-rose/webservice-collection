@@ -10,7 +10,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
-	[RoutePrefix("/api/v1/settings")]
+	[RoutePrefix("api/v1/settings")]
 	[ApiAuthentification(true)]
 	public class SettingsController : ApiController
 	{

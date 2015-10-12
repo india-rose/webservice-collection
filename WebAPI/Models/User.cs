@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.Models
 {
@@ -9,10 +7,8 @@ namespace WebAPI.Models
 		[Key]
 		public long Id { get; set; }
 
-		[Index]
 		public string Login { get; set; }
 
-		[Index]
 		public string Email { get; set; }
 
 		public string Password { get; set; }

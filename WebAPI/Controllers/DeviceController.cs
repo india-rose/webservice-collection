@@ -11,7 +11,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
-	[RoutePrefix("/api/v1/devices")]
+	[RoutePrefix("api/v1/devices")]
 	[ApiAuthentification]
 	public class DeviceController : ApiController
 	{

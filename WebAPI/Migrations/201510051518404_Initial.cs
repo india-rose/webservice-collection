@@ -28,9 +28,7 @@ namespace WebAPI.Migrations
                         Email = c.String(),
                         Password = c.String(),
                     })
-                .PrimaryKey(t => t.Id)
-                .Index(t => t.Login)
-                .Index(t => t.Email);
+                .PrimaryKey(t => t.Id);
             
             CreateTable(
                 "dbo.Indiagrams",
@@ -38,16 +36,16 @@ namespace WebAPI.Migrations
                     {
                         Id = c.Long(nullable: false, identity: true),
                         UserId = c.Long(nullable: false),
-                        LastIndiagramInfoId = c.Long(nullable: false),
+                        LastIndiagramInfoId = c.Long(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.IndiagramInfoes", t => t.LastIndiagramInfoId, cascadeDelete: true)
+                .ForeignKey("dbo.IndiagramInfos", t => t.LastIndiagramInfoId)
                 .ForeignKey("dbo.Users", t => t.UserId, cascadeDelete: true)
                 .Index(t => t.UserId)
                 .Index(t => t.LastIndiagramInfoId);
             
             CreateTable(
-                "dbo.IndiagramInfoes",
+                "dbo.IndiagramInfos",
                 c => new
                     {
                         Id = c.Long(nullable: false, identity: true),
@@ -61,26 +59,23 @@ namespace WebAPI.Migrations
                         SoundHash = c.String(),
                         ImageHash = c.String(),
                         IsCategory = c.Boolean(nullable: false),
-                        Indiagram_Id = c.Long(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Indiagrams", t => t.IndiagramId, cascadeDelete: true)
-                .ForeignKey("dbo.Indiagrams", t => t.Indiagram_Id)
-                .Index(t => t.IndiagramId)
-                .Index(t => t.Indiagram_Id);
+                .Index(t => t.IndiagramId);
             
             CreateTable(
                 "dbo.IndiagramStates",
                 c => new
                     {
                         Id = c.Long(nullable: false, identity: true),
-                        IndiagramInfoId = c.Long(nullable: false),
+                        IndiagramInfoId = c.Long(),
                         DeviceId = c.Long(nullable: false),
                         IsEnabled = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Devices", t => t.DeviceId, cascadeDelete: true)
-                .ForeignKey("dbo.IndiagramInfoes", t => t.IndiagramInfoId, cascadeDelete: true)
+                .ForeignKey("dbo.IndiagramInfos", t => t.IndiagramInfoId)
                 .Index(t => t.IndiagramInfoId)
                 .Index(t => t.DeviceId);
             
@@ -118,27 +113,23 @@ namespace WebAPI.Migrations
             DropForeignKey("dbo.Versions", "UserId", "dbo.Users");
             DropForeignKey("dbo.Settings", "DeviceId", "dbo.Devices");
             DropForeignKey("dbo.Indiagrams", "UserId", "dbo.Users");
-            DropForeignKey("dbo.Indiagrams", "LastIndiagramInfoId", "dbo.IndiagramInfoes");
-            DropForeignKey("dbo.IndiagramInfoes", "Indiagram_Id", "dbo.Indiagrams");
-            DropForeignKey("dbo.IndiagramStates", "IndiagramInfoId", "dbo.IndiagramInfoes");
+            DropForeignKey("dbo.Indiagrams", "LastIndiagramInfoId", "dbo.IndiagramInfos");
+            DropForeignKey("dbo.IndiagramInfos", "IndiagramId", "dbo.Indiagrams");
+            DropForeignKey("dbo.IndiagramStates", "IndiagramInfoId", "dbo.IndiagramInfos");
             DropForeignKey("dbo.IndiagramStates", "DeviceId", "dbo.Devices");
-            DropForeignKey("dbo.IndiagramInfoes", "IndiagramId", "dbo.Indiagrams");
             DropForeignKey("dbo.Devices", "UserId", "dbo.Users");
             DropIndex("dbo.Versions", new[] { "UserId" });
             DropIndex("dbo.Settings", new[] { "DeviceId" });
             DropIndex("dbo.IndiagramStates", new[] { "DeviceId" });
             DropIndex("dbo.IndiagramStates", new[] { "IndiagramInfoId" });
-            DropIndex("dbo.IndiagramInfoes", new[] { "Indiagram_Id" });
-            DropIndex("dbo.IndiagramInfoes", new[] { "IndiagramId" });
+            DropIndex("dbo.IndiagramInfos", new[] { "IndiagramId" });
             DropIndex("dbo.Indiagrams", new[] { "LastIndiagramInfoId" });
             DropIndex("dbo.Indiagrams", new[] { "UserId" });
-            DropIndex("dbo.Users", new[] { "Email" });
-            DropIndex("dbo.Users", new[] { "Login" });
             DropIndex("dbo.Devices", new[] { "UserId" });
             DropTable("dbo.Versions");
             DropTable("dbo.Settings");
             DropTable("dbo.IndiagramStates");
-            DropTable("dbo.IndiagramInfoes");
+            DropTable("dbo.IndiagramInfos");
             DropTable("dbo.Indiagrams");
             DropTable("dbo.Users");
             DropTable("dbo.Devices");
