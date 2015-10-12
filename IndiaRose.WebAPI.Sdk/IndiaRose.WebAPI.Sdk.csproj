@@ -44,11 +44,13 @@
     <Compile Include="Headers.cs" />
     <Compile Include="Interfaces\IApiLogger.cs" />
     <Compile Include="Interfaces\IApiService.cs" />
+    <Compile Include="Models\ApiResult.cs" />
     <Compile Include="Models\DeviceInfo.cs" />
     <Compile Include="Models\HttpResult.cs" />
     <Compile Include="Interfaces\IRequestService.cs" />
     <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\SettingsStatusCode.cs" />
     <Compile Include="Results\DeviceStatusCode.cs" />
     <Compile Include="Results\UserStatusCode.cs" />
     <Compile Include="Services\ApiLogger.cs" />

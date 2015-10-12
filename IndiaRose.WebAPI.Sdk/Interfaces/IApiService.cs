@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
+using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
 namespace IndiaRose.WebAPI.Sdk.Interfaces
@@ -46,8 +47,15 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 		/// List all devices for user
 		/// </summary>
 		/// <param name="user">user information</param>
-		/// <param name="resultList">result list of devices</param>
-		/// <returns>status code</returns>
-		Task<DeviceStatusCode> ListDevicesAsync(UserInfo user, List<DeviceResponse> resultList);
+		/// <returns>status code + content result</returns>
+		Task<ApiResult<DeviceStatusCode, List<DeviceResponse>>> ListDevicesAsync(UserInfo user);
+
+		Task<ApiResult<SettingsStatusCode, SettingsResponse>> GetLastSettingsAsync(UserInfo user, DeviceInfo device);
+
+		Task<SettingsStatusCode> UpdateSettingsAsync(UserInfo user, DeviceInfo device, string serializedSettingsData);
+
+		Task<ApiResult<SettingsStatusCode, SettingsResponse>> GetVersionSettingsAsync(UserInfo user, DeviceInfo device, long versionNumber);
+
+		Task<ApiResult<SettingsStatusCode, List<SettingsResponse>>> GetSettingsListAsync(UserInfo user, DeviceInfo device);
 	}
 }

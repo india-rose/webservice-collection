@@ -177,36 +177,162 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return DeviceStatusCode.InternalError;
 		}
 
-		public async Task<DeviceStatusCode> ListDevicesAsync(UserInfo user, List<DeviceResponse> resultList)
+		public async Task<ApiResult<DeviceStatusCode, List<DeviceResponse>>> ListDevicesAsync(UserInfo user)
 		{
 			string requestDescription = string.Format("ListDevicesAsync(({0}, {1}))", user.Login, user.Password);
 			_apiLogger.LogRequest(requestDescription);
-			
+
 			HttpResult result = await _requestService.GetAsync(_apiHost + Uris.DEVICE_LIST, UserHeaders(user));
 			if (result.InnerException != null)
 			{
 				_apiLogger.LogError(requestDescription, result.InnerException);
-				return DeviceStatusCode.InternalError;
+				return ApiResult.From<DeviceStatusCode, List<DeviceResponse>>(DeviceStatusCode.InternalError, null);
 			}
 			switch (result.StatusCode)
 			{
 				case HttpStatusCode.OK:
-				{
-					RequestResult<List<DeviceResponse>> requestResult = Deserialize<List<DeviceResponse>>(result.Content, requestDescription);
-					if (requestResult == null)
 					{
-						return DeviceStatusCode.InternalError;
+						RequestResult<List<DeviceResponse>> requestResult = Deserialize<List<DeviceResponse>>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<DeviceStatusCode, List<DeviceResponse>>(DeviceStatusCode.InternalError, null);
+						}
+						return ApiResult.From(DeviceStatusCode.Ok, requestResult.Content);
 					}
-					resultList.Clear();
-					resultList.AddRange(requestResult.Content);
-					return DeviceStatusCode.Ok;
-				}
 				case HttpStatusCode.Unauthorized:
-					return DeviceStatusCode.InvalidLoginOrPassword;
+					return ApiResult.From<DeviceStatusCode, List<DeviceResponse>>(DeviceStatusCode.InvalidLoginOrPassword, null);
 			}
 
 			_apiLogger.LogServerError(requestDescription, result.Content);
-			return DeviceStatusCode.InternalError;
+			return ApiResult.From<DeviceStatusCode, List<DeviceResponse>>(DeviceStatusCode.InternalError, null);
+
+		}
+
+		public async Task<ApiResult<SettingsStatusCode, SettingsResponse>> GetLastSettingsAsync(UserInfo user, DeviceInfo device)
+		{
+			string requestDescription = string.Format("GetLastSettingsAsync(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + Uris.SETTINGS_LAST, DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<SettingsResponse> requestResult = Deserialize<SettingsResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InternalError, null);
+						}
+						return ApiResult.From(SettingsStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.SettingsNotFound, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InternalError, null);
+		}
+
+		public async Task<SettingsStatusCode> UpdateSettingsAsync(UserInfo user, DeviceInfo device, string serializedSettingsData)
+		{
+			string requestDescription = string.Format("UpdateSettingsAsync(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, serializedSettingsData);
+			_apiLogger.LogRequest(requestDescription);
+
+			string requestContent = JsonConvert.SerializeObject(new SettingsUpdateRequest
+			{
+				Data = serializedSettingsData
+			});
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.SETTINGS_UPDATE, requestContent, DeviceHeaders(user, device));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return SettingsStatusCode.InternalError;
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.Accepted:
+					return SettingsStatusCode.Ok;
+				case HttpStatusCode.BadRequest:
+					return SettingsStatusCode.BadRequest;
+				case HttpStatusCode.Unauthorized:
+					return SettingsStatusCode.InvalidLoginOrPassword;
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return SettingsStatusCode.InternalError;
+		}
+
+		public async Task<ApiResult<SettingsStatusCode, SettingsResponse>> GetVersionSettingsAsync(UserInfo user, DeviceInfo device, long versionNumber)
+		{
+			string requestDescription = string.Format("GetVersionSettingsAsync(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, versionNumber);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + string.Format(Uris.SETTINGS_GET_VERSION, versionNumber), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<SettingsResponse> requestResult = Deserialize<SettingsResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InternalError, null);
+						}
+						return ApiResult.From(SettingsStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.SettingsNotFound, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.BadRequest, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<SettingsStatusCode, SettingsResponse>(SettingsStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<SettingsStatusCode, List<SettingsResponse>>> GetSettingsListAsync(UserInfo user, DeviceInfo device)
+		{
+			string requestDescription = string.Format("GetSettingsListAsync(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + Uris.SETTINGS_LIST, DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<SettingsStatusCode, List<SettingsResponse>>(SettingsStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<List<SettingsResponse>> requestResult = Deserialize<List<SettingsResponse>>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<SettingsStatusCode, List<SettingsResponse>>(SettingsStatusCode.InternalError, null);
+						}
+						return ApiResult.From(SettingsStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<SettingsStatusCode, List<SettingsResponse>>(SettingsStatusCode.InvalidLoginOrPassword, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<SettingsStatusCode, List<SettingsResponse>>(SettingsStatusCode.InternalError, null);
 		}
 
 		private RequestResult<T> Deserialize<T>(string data, string requestDescription)
@@ -217,7 +343,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 
 				if (result == null)
 				{
-					_apiLogger.LogServerError(requestDescription, string.Format("Invalid json content to deserialize to RequestResult<{0}> : {1}", typeof (T), data));
+					_apiLogger.LogServerError(requestDescription, string.Format("Invalid json content to deserialize to RequestResult<{0}> : {1}", typeof(T), data));
 					return null;
 				}
 				return result;
