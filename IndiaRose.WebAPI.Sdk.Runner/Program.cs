@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using IndiaRose.WebAPI.Sdk.Interfaces;
+using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
 using IndiaRose.WebAPI.Sdk.Services;
+using WebAPI.Common.Responses;
 
 namespace IndiaRose.WebAPI.Sdk.Runner
 {
@@ -32,7 +35,28 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 			result = await api.LoginUserAsync("india", passwd);
 
 			Console.WriteLine("Result Code {0}", result);
-			
+
+			UserInfo badUserInfo = new UserInfo {Login = "test", Password = "test"};
+			UserInfo userInfo = new UserInfo{Login = "india", Password = passwd};
+			DeviceStatusCode dResult = await api.CreateDeviceAsync(badUserInfo, "test123");
+			Console.WriteLine("Create bad device : {0}", dResult);
+			dResult = await api.CreateDeviceAsync(userInfo, "test123");
+			Console.WriteLine("Create good device : {0}", dResult);
+
+			List<DeviceResponse> devices = new List<DeviceResponse>();
+			dResult = await api.ListDevicesAsync(userInfo, devices);
+			Console.WriteLine("Display devices : {0}", dResult);
+			devices.ForEach(x => Console.WriteLine("\t{0}", x.Name));
+
+			dResult = await api.RenameDeviceAsync(userInfo, "test123", "test456");
+			Console.WriteLine("Rename device : {0}", dResult);
+
+			dResult = await api.ListDevicesAsync(userInfo, devices);
+			Console.WriteLine("Display devices : {0}", dResult);
+			devices.ForEach(x => Console.WriteLine("\t{0}", x.Name));
+
+
+
 			//Console.WriteLine("Got result {0}", result);
 		}
 

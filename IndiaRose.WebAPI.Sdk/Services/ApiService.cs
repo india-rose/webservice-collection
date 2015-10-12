@@ -109,6 +109,130 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return UserStatusCode.InternalError;
 		}
 
+		public async Task<DeviceStatusCode> CreateDeviceAsync(UserInfo user, string deviceName)
+		{
+			string requestDescription = string.Format("CreateDeviceAsync(({0}, {1}), {2})", user.Login, user.Password, deviceName);
+			_apiLogger.LogRequest(requestDescription);
+
+			string requestContent = JsonConvert.SerializeObject(new DeviceCreateRequest
+			{
+				Name = deviceName
+			});
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.DEVICE_CREATE, requestContent, UserHeaders(user));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return DeviceStatusCode.InternalError;
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.Created:
+					return DeviceStatusCode.Ok;
+				case HttpStatusCode.BadRequest:
+					return DeviceStatusCode.BadRequest;
+				case HttpStatusCode.Conflict:
+					return DeviceStatusCode.DeviceAlreadyExists;
+				case HttpStatusCode.Unauthorized:
+					return DeviceStatusCode.InvalidLoginOrPassword;
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return DeviceStatusCode.InternalError;
+
+		}
+
+		public async Task<DeviceStatusCode> RenameDeviceAsync(UserInfo user, string actualName, string newName)
+		{
+			string requestDescription = string.Format("RenameDeviceAsync(({0}, {1}), {2}, {3})", user.Login, user.Password, actualName, newName);
+			_apiLogger.LogRequest(requestDescription);
+
+			string requestContent = JsonConvert.SerializeObject(new DeviceRenameRequest
+			{
+				ActualName = actualName,
+				NewName = newName
+			});
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.DEVICE_RENAME, requestContent, UserHeaders(user));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return DeviceStatusCode.InternalError;
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.Accepted:
+					return DeviceStatusCode.Ok;
+				case HttpStatusCode.BadRequest:
+					return DeviceStatusCode.BadRequest;
+				case HttpStatusCode.Conflict:
+					return DeviceStatusCode.DeviceAlreadyExists;
+				case HttpStatusCode.Unauthorized:
+					return DeviceStatusCode.InvalidLoginOrPassword;
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return DeviceStatusCode.InternalError;
+		}
+
+		public async Task<DeviceStatusCode> ListDevicesAsync(UserInfo user, List<DeviceResponse> resultList)
+		{
+			string requestDescription = string.Format("ListDevicesAsync(({0}, {1}))", user.Login, user.Password);
+			_apiLogger.LogRequest(requestDescription);
+			
+			HttpResult result = await _requestService.GetAsync(_apiHost + Uris.DEVICE_LIST, UserHeaders(user));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return DeviceStatusCode.InternalError;
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+				{
+					RequestResult<List<DeviceResponse>> requestResult = Deserialize<List<DeviceResponse>>(result.Content, requestDescription);
+					if (requestResult == null)
+					{
+						return DeviceStatusCode.InternalError;
+					}
+					resultList.Clear();
+					resultList.AddRange(requestResult.Content);
+					return DeviceStatusCode.Ok;
+				}
+				case HttpStatusCode.Unauthorized:
+					return DeviceStatusCode.InvalidLoginOrPassword;
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return DeviceStatusCode.InternalError;
+		}
+
+		private RequestResult<T> Deserialize<T>(string data, string requestDescription)
+		{
+			try
+			{
+				RequestResult<T> result = JsonConvert.DeserializeObject<RequestResult<T>>(data);
+
+				if (result == null)
+				{
+					_apiLogger.LogServerError(requestDescription, string.Format("Invalid json content to deserialize to RequestResult<{0}> : {1}", typeof (T), data));
+					return null;
+				}
+				return result;
+			}
+			catch (Exception)
+			{
+				//ignore
+			}
+
+			_apiLogger.LogServerError(requestDescription, string.Format("Invalid json content to deserialize to RequestResult<{0}> : {1}", typeof(T), data));
+			return null;
+		}
+
+		#region Headers
+
 		private Dictionary<string, string> DefaultHeaders()
 		{
 			return new Dictionary<string, string>
@@ -116,5 +240,23 @@ namespace IndiaRose.WebAPI.Sdk.Services
 				{"Accept", "application/json"}
 			};
 		}
+
+		private Dictionary<string, string> UserHeaders(UserInfo user)
+		{
+			Dictionary<string, string> result = DefaultHeaders();
+			result.Add(Headers.LOGIN, user.Login);
+			result.Add(Headers.PASSWORD, user.Password);
+			return result;
+		}
+
+		private Dictionary<string, string> DeviceHeaders(UserInfo user, DeviceInfo device)
+		{
+			Dictionary<string, string> result = UserHeaders(user);
+			result.Add(Headers.DEVICE, device.Name);
+			return result;
+		}
+
+		#endregion
+
 	}
 }
