@@ -35,6 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Requests\DeviceCreateRequest.cs" />
+    <Compile Include="Requests\DeviceRenameRequest.cs" />
     <Compile Include="Requests\IndiagramRequest.cs" />
     <Compile Include="Requests\UserLoginRequest.cs" />
     <Compile Include="Requests\UserRegisterRequest.cs" />

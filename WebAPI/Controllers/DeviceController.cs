@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
 using WebAPI.Extensions;
@@ -17,9 +18,9 @@ namespace WebAPI.Controllers
 	{
 		[Route("create")]
 		[HttpPost]
-		public HttpResponseMessage CreateDevice([FromBody] string name)
+		public HttpResponseMessage CreateDevice([FromBody] DeviceCreateRequest device)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+			if (string.IsNullOrWhiteSpace(device.Name))
 			{
 				return Request.CreateBadRequestResponse();
 			}
@@ -28,21 +29,21 @@ namespace WebAPI.Controllers
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				if (database.HasDevice(user, name))
+				if (database.HasDevice(user, device.Name))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Device name already exists");
 				}
 				
-				database.CreateDevice(user, name);
+				database.CreateDevice(user, device.Name);
 				return Request.CreateResponse(HttpStatusCode.Created);
 			}
 		}
 
 		[Route("rename")]
 		[HttpPost]
-		public HttpResponseMessage RenameDevice([FromBody] string oldName, string newName)
+		public HttpResponseMessage RenameDevice([FromBody] DeviceRenameRequest device)
 		{
-			if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName))
+			if (string.IsNullOrWhiteSpace(device.ActualName) || string.IsNullOrWhiteSpace(device.NewName))
 			{
 				return Request.CreateBadRequestResponse();
 			}
@@ -51,7 +52,7 @@ namespace WebAPI.Controllers
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				if (!database.UpdateDevice(user, oldName, newName))
+				if (!database.UpdateDevice(user, device.ActualName, device.NewName))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Device name not found");
 				}
