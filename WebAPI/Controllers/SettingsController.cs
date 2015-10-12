@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
 using WebAPI.Extensions;
@@ -33,9 +34,9 @@ namespace WebAPI.Controllers
 
 		[Route("update")]
 		[HttpPost]
-		public HttpResponseMessage Update([FromBody] string settingsData)
+		public HttpResponseMessage Update([FromBody] SettingsUpdateRequest settingsData)
 		{
-			if (string.IsNullOrWhiteSpace(settingsData))
+			if (string.IsNullOrWhiteSpace(settingsData.Data))
 			{
 				return Request.CreateBadRequestResponse();
 			}
@@ -43,7 +44,7 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				Device device = RequestContext.GetDevice();
-				Settings settings = database.CreateSettings(device, settingsData);
+				Settings settings = database.CreateSettings(device, settingsData.Data);
 
 				if (settings == null)
 				{

@@ -38,6 +38,7 @@
     <Compile Include="Requests\DeviceCreateRequest.cs" />
     <Compile Include="Requests\DeviceRenameRequest.cs" />
     <Compile Include="Requests\IndiagramRequest.cs" />
+    <Compile Include="Requests\SettingsUpdateRequest.cs" />
     <Compile Include="Requests\UserLoginRequest.cs" />
     <Compile Include="Requests\UserRegisterRequest.cs" />
     <Compile Include="Responses\DeviceResponse.cs" />
