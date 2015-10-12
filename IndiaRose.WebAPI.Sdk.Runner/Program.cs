@@ -79,6 +79,30 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				Console.WriteLine("\tData : {0}", sResult.Content.Settings);
 			}
 
+			var slResult = await api.GetSettingsListAsync(userInfo, device);
+			Console.WriteLine("Get list of settings => {0}", slResult.Status);
+			if (slResult.Content != null)
+			{
+				foreach (var settings in slResult.Content)
+				{
+					Console.WriteLine("\tDate : {0}", settings.Date);
+					Console.WriteLine("\tVersion : {0}", settings.Version);
+					Console.WriteLine("\tData : {0}", settings.Settings);
+				}
+				Console.WriteLine();
+			}
+			Console.WriteLine();
+
+
+			sResult = await api.GetVersionSettingsAsync(userInfo, device, 2);
+			Console.WriteLine("Get Settings for version 2: {0}", sResult.Status);
+			if (sResult.Content != null)
+			{
+				Console.WriteLine("\tDate : {0}", sResult.Content.Date);
+				Console.WriteLine("\tVersion : {0}", sResult.Content.Version);
+				Console.WriteLine("\tData : {0}", sResult.Content.Settings);
+			}
+
 
 			//Console.WriteLine("Got result {0}", result);
 		}

@@ -121,7 +121,7 @@ namespace WebAPI.Database
 
 		public IEnumerable<Settings> GetSettings(Device device)
 		{
-			return _context.Settings.Where(x => x.DeviceId == device.Id);
+			return _context.Settings.Where(x => x.DeviceId == device.Id).OrderByDescending(x => x.VersionNumber);
 		}
 
 		public Settings GetSettings(Device device, long version)
