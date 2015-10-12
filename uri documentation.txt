@@ -7,7 +7,7 @@ Utilisateurs (ErrorCode 1XX) : /users
 		
 		Code de retour
 			Http 400 (Bad request) => il manque un champ dans la requète
-			Http 200 => {
+			Http 200 (Ok) => {
 				errorCode 100 => Le login est déjà utilisé par un autre utilisateur
 				errorCode 101 => L'email est déjà utilisé par un autre utilisateur
 				pas d'erreur => L'utilisateur a été créé
@@ -18,8 +18,8 @@ Utilisateurs (ErrorCode 1XX) : /users
 
 		Code de retour
 			Http 400 (Bad request) => il manque un champ dans la requète
-			Http 401 => authentification incorrecte
-			Http 200 => {
+			Http 401 (Unauthorized) => authentification incorrecte
+			Http 200 (Ok) => {
 				pas d'erreur => L'utilisateur est loggé
 			}
 
@@ -28,7 +28,7 @@ Toutes les autres requête nécessite de positionner les deux headers suivant :
 	x-indiarose-password : le password de l'utilisateur en hash sha256
 
 	Code de retour
-		Http 401 => Authentification incorrecte
+		Http 401 (Unauthorized) => Authentification incorrecte
 
 Devices (ErrorCode 2XX) : /devices
 	POST /create : création d'un device
@@ -37,8 +37,8 @@ Devices (ErrorCode 2XX) : /devices
 
 		Code de retour
 			Http 400 (Bad request) => il manque un champ dans la requète
-			Http 409 => ce nom existe déjà
-			Http 201 => created
+			Http 409 (Conflict) => ce nom existe déjà
+			Http 201 (Created) => created
 
 	POST /rename : renommage d'un device
 		paramètre requis : oldName, newName
@@ -46,15 +46,15 @@ Devices (ErrorCode 2XX) : /devices
 
 		Code de retour
 			Http 400 (Bad request) => il manque un champ dans la requète
-			Http 404 => pas de device trouvé avec ce nom
-			Http 202 => updated
+			Http 404 (Not found) => pas de device trouvé avec ce nom
+			Http 202 (Accepted) => updated
 
 	GET /list : obtient la liste des devices de l'utilisateur
 		paramètre requis : <none>
 		parmaètre optionels : <none>
 
 		Code de retour
-			Http 200 => {
+			Http 200 (Ok) => {
 				pas d'erreur => List<DeviceResponse> dans le Content de la réponse
 			}
 	
@@ -62,7 +62,7 @@ Toutes les autres requête nécessite de positionner le header suivant :
 	x-indiarose-device : le nom du device de l'utilisateur
 
 	Code de retour
-		Http 401 => Device name incorrecte
+		Http 401 (Unauthorized) => Device incorrect
 
 
 Settings (ErrorCode 3XX) : /settings
@@ -72,7 +72,7 @@ Settings (ErrorCode 3XX) : /settings
 
 		Code de retour 
 			Http 404 (Not found) => aucune version des settings n'est disponible
-			Http 200 => {
+			Http 200 (Ok) => {
 				pas d'erreur => SettingsResponse dans le Content de la réponse
 			}
 
@@ -81,7 +81,9 @@ Settings (ErrorCode 3XX) : /settings
 		paramètre optionel : <none>
 
 		Code de retour
-			Http 200 => {
+			Http 400 (Bad request) => paramètres incorrects
+			Http 500 (Server error) => impossible de sauvegarder les paramêtres
+			Http 200 (Ok) => {
 				pas d'erreur => SettingsResponse dans le Content de la réponse
 			}
 
@@ -90,8 +92,9 @@ Settings (ErrorCode 3XX) : /settings
 		paramètre optionel : <none>
 
 		Code de retour
+			Http 400 (Bad request) => le numéro de version n'est pas un entier
 			Http 404 (Not found) => pas de settings existant pour cette version
-			Http 200 => {
+			Http 200 (Ok) => {
 				pas d'erreur => SettingsResponse dans le content de la réponse
 			}
 
@@ -100,7 +103,7 @@ Settings (ErrorCode 3XX) : /settings
 		paramètre optionel <none>
 
 		Code de retour
-			Http 200 => {
+			Http 200 (Ok) => {
 				pas d'erreur => List<SettingsResponse> dans le Content de la réponse
 			}
 
