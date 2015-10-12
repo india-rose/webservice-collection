@@ -43,18 +43,41 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 			dResult = await api.CreateDeviceAsync(userInfo, "test123");
 			Console.WriteLine("Create good device : {0}", dResult);
 
-			List<DeviceResponse> devices = new List<DeviceResponse>();
-			dResult = await api.ListDevicesAsync(userInfo, devices);
-			Console.WriteLine("Display devices : {0}", dResult);
-			devices.ForEach(x => Console.WriteLine("\t{0}", x.Name));
+			ApiResult<DeviceStatusCode, List<DeviceResponse>> deviceListResult = await api.ListDevicesAsync(userInfo);
+			Console.WriteLine("Display devices : {0}", deviceListResult.Status);
+			deviceListResult.Content.ForEach(x => Console.WriteLine("\t{0}", x.Name));
 
 			dResult = await api.RenameDeviceAsync(userInfo, "test123", "test456");
 			Console.WriteLine("Rename device : {0}", dResult);
 
-			dResult = await api.ListDevicesAsync(userInfo, devices);
-			Console.WriteLine("Display devices : {0}", dResult);
-			devices.ForEach(x => Console.WriteLine("\t{0}", x.Name));
+			deviceListResult = await api.ListDevicesAsync(userInfo);
+			Console.WriteLine("Display devices : {0}", deviceListResult.Status);
+			deviceListResult.Content.ForEach(x => Console.WriteLine("\t{0}", x.Name));
 
+			DeviceInfo device = new DeviceInfo
+			{
+				Name = "test456"
+			};
+			var sResult = await api.GetLastSettingsAsync(userInfo, device);
+			Console.WriteLine("Get Settings : {0}", sResult.Status);
+			if (sResult.Content != null)
+			{
+				Console.WriteLine("\tDate : {0}", sResult.Content.Date);
+				Console.WriteLine("\tVersion : {0}", sResult.Content.Version);
+				Console.WriteLine("\tData : {0}", sResult.Content.Settings);
+			}
+
+			var updateResult = await api.UpdateSettingsAsync(userInfo, device, "test settings v1");
+			Console.WriteLine("update settings : {0}", updateResult);
+
+			sResult = await api.GetLastSettingsAsync(userInfo, device);
+			Console.WriteLine("Get Settings : {0}", sResult.Status);
+			if (sResult.Content != null)
+			{
+				Console.WriteLine("\tDate : {0}", sResult.Content.Date);
+				Console.WriteLine("\tVersion : {0}", sResult.Content.Version);
+				Console.WriteLine("\tData : {0}", sResult.Content.Settings);
+			}
 
 
 			//Console.WriteLine("Got result {0}", result);

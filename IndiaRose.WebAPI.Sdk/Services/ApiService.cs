@@ -259,7 +259,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			}
 			switch (result.StatusCode)
 			{
-				case HttpStatusCode.Accepted:
+				case HttpStatusCode.OK:
 					return SettingsStatusCode.Ok;
 				case HttpStatusCode.BadRequest:
 					return SettingsStatusCode.BadRequest;

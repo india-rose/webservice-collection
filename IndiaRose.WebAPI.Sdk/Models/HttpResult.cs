@@ -3,7 +3,7 @@ using System.Net;
 
 namespace IndiaRose.WebAPI.Sdk.Models
 {
-	class HttpResult
+	public class HttpResult
 	{
 		public HttpStatusCode StatusCode { get; set; }
 
