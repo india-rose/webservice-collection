@@ -116,7 +116,9 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\DeviceController.cs" />
-    <Compile Include="Controllers\IndiagramController.cs" />
+    <Compile Include="Controllers\IndiagramWriteController.cs" />
+    <Compile Include="Controllers\IndiagramControllerBase.cs" />
+    <Compile Include="Controllers\IndiagramReadController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Database\DatabaseContext.cs" />
@@ -181,7 +183,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>59911</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
