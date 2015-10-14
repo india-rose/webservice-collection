@@ -46,11 +46,16 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
 				}
 
-				IndiagramInfo indiagramInfo = database.GetOrCreateIndiagramInfo(user.Id, indiagramId, version);
+				IndiagramInfo indiagramInfo = database.GetLastIndiagramInfo(user.Id, indiagramId);
 
 				if (indiagramInfo == null)
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				if (indiagramInfo.Version != version)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not modify old indiagram version");
 				}
 
 				HttpContent file = provider.Contents.First();

@@ -34,10 +34,15 @@ namespace WebAPI.Database
 		List<IndiagramForDevice> GetIndiagrams(Device device, long version);
 		IndiagramForDevice GetIndiagram(Device device, long id);
 		IndiagramForDevice GetIndiagram(Device device, long id, long version);
-		IndiagramInfo GetOrCreateIndiagramInfo(long userId, long indiagramId, long version);
+
+		IndiagramInfo GetLastIndiagramInfo(long userId, long indiagramId);
+		IndiagramInfo GetIndiagramInfo(long userId, long indiagramId, long version);
+		IndiagramInfo CreateIndiagramInfo(long userId, long indiagramId, long version);
+	
 		void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
 		void SetIndiagramSound(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
 		Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest indiagram);
+		Indiagram UpdateIndiagram(long userId, long deviceId, IndiagramRequest indiagram);
 
 		// collection versions
 		bool HasIndiagramVersion(long userId, long version);

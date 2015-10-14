@@ -122,6 +122,7 @@
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\VersionController.cs" />
+    <Compile Include="Database\DatabaseCollectionService.cs" />
     <Compile Include="Database\DatabaseContext.cs" />
     <Compile Include="Database\DatabaseService.cs" />
     <Compile Include="Database\IStorageService.cs" />

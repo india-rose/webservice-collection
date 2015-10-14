@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -26,18 +27,30 @@ namespace WebAPI.Controllers
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				//TODO : call create only if request.Id < 0
 				Device device = RequestContext.GetDevice();
+				if (!database.HasIndiagramVersion(device.UserId, request.Version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "version not found");
+				}
+
 				if (request.Id < 0)
 				{
 					Indiagram indiagram = database.CreateIndiagram(device.UserId, device.Id, request);
-					return Request.CreateGoodReponse(database.GetIndiagram(device, indiagram.Id));
+					return Request.CreateGoodReponse(ToResponse(database.GetIndiagram(device, indiagram.Id)));
 				}
 				else
 				{
-					//TODO
-					throw new NotImplementedException();
+					//update
+					Indiagram indiagram = database.UpdateIndiagram(device.UserId, device.Id, request);
+
+					if (indiagram == null)
+					{
+						return Request.CreateErrorResponse(HttpStatusCode.NotFound, "indiagram not found");
+					}
+
+					return Request.CreateGoodReponse(ToResponse(database.GetIndiagram(device, indiagram.Id)));
 				}
+				
 			}
 		}
 
