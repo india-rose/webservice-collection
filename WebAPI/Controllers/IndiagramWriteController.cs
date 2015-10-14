@@ -8,7 +8,6 @@ using WebAPI.Database;
 using WebAPI.Extensions;
 using WebAPI.Filters;
 using WebAPI.Models;
-using Version = WebAPI.Models.Version;
 
 namespace WebAPI.Controllers
 {
@@ -16,21 +15,7 @@ namespace WebAPI.Controllers
 	[ApiAuthentification(true)]
 	public class IndiagramWriteController : IndiagramControllerBase
 	{
-		[Route("create/version")]
-		[HttpPost]
-		public HttpResponseMessage CreateVersion()
-		{
-			User user = RequestContext.GetAuthenticatedUser();
-
-			using (IDatabaseService database = new DatabaseService())
-			{
-				Version version = database.CreateVersion(user.Id);
-
-				return Request.CreateGoodReponse(ToResponse(version));
-			}
-		}
-
-		[Route("update/indiagram")]
+		[Route("indiagrams/update")]
 		[HttpPost]
 		public HttpResponseMessage CreateIndiagram([FromBody] IndiagramRequest request)
 		{
@@ -56,7 +41,7 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[Route("image/{id}/{versionNumber}")]
+		[Route("images/{id}/{versionNumber}")]
 		[HttpPost]
 		public async Task<HttpResponseMessage> PostImage([FromUri] string id, [FromUri] string versionNumber)
 		{
@@ -73,7 +58,7 @@ namespace WebAPI.Controllers
 			});
 		}
 
-		[Route("sound/{id}/{versionNumber}")]
+		[Route("sounds/{id}/{versionNumber}")]
 		[HttpPost]
 		public async Task<HttpResponseMessage> PostSound([FromUri] string id, [FromUri] string versionNumber)
 		{

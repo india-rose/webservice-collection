@@ -58,7 +58,7 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[Route("indiagram/{id}")]
+		[Route("indiagrams/{id}")]
 		[HttpGet]
 		public HttpResponseMessage Indiagram([FromUri] string id)
 		{
@@ -82,7 +82,7 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[Route("indiagram/{id}/{versionNumber}")]
+		[Route("indiagrams/{id}/{versionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Indiagram([FromUri] string id, [FromUri] string versionNumber)
 		{
@@ -96,6 +96,11 @@ namespace WebAPI.Controllers
 
 			using (IDatabaseService database = new DatabaseService())
 			{
+				if (!database.HasIndiagramVersion(device.UserId, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
 				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId, version);
 
 				if (resultIndiagram == null)
@@ -107,62 +112,33 @@ namespace WebAPI.Controllers
 			}
 		}
 
-		[Route("image/{id}")]
+		[Route("images/{id}")]
 		[HttpGet]
 		public HttpResponseMessage Image([FromUri] string id)
 		{
 			throw new NotImplementedException();
 		}
 
-		[Route("image/{id}/{versionNumber}")]
+		[Route("images/{id}/{versionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Image([FromUri] string id, [FromUri] string versionNumber)
 		{
 			throw new NotImplementedException();
 		}
 
-		[Route("sound/{id}")]
+		[Route("sounds/{id}")]
 		[HttpGet]
 		public HttpResponseMessage Sound([FromUri] string id)
 		{
 			throw new NotImplementedException();
 		}
 
-		[Route("sound/{id}/{versionNumber}")]
+		[Route("sounds/{id}/{versionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Sound([FromUri] string id, [FromUri] string versionNumber)
 		{
 			throw new NotImplementedException();
 		}
 
-		[Route("versions")]
-		[HttpGet]
-		public HttpResponseMessage Versions()
-		{
-			User user = RequestContext.GetAuthenticatedUser();
-
-			using (IDatabaseService database = new DatabaseService())
-			{
-				return Request.CreateGoodReponse(database.GetVersions(user.Id).Select(x => ToResponse(x)));
-			}
-		}
-
-		[Route("versions/{fromVersionNumber}")]
-		[HttpGet]
-		public HttpResponseMessage Versions([FromUri] string fromVersionNumber)
-		{
-			long fromVersion;
-			if (!long.TryParse(fromVersionNumber, out fromVersion))
-			{
-				return Request.CreateBadRequestResponse();
-			}
-
-			User user = RequestContext.GetAuthenticatedUser();
-
-			using (IDatabaseService database = new DatabaseService())
-			{
-				return Request.CreateGoodReponse(database.GetVersions(user.Id).Select(x => ToResponse(x)));
-			}
-		}
 	}
 }

@@ -106,10 +106,5 @@ namespace WebAPI.Controllers
 				Position = indiagram.Position
 			};
 		}
-
-		protected VersionResponse ToResponse(Models.Version version)
-		{
-			return new VersionResponse(version.Number, version.Date);
-		}
 	}
 }
