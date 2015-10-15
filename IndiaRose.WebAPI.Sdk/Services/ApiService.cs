@@ -24,6 +24,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			_apiHost = apiHost;
 		}
 
+		// users
 		public async Task<UserStatusCode> RegisterUserAsync(string login, string email, string password)
 		{
 			string requestDescription = string.Format("RegisterUserAsync({0}, {1}, {2})", login, email, password);
@@ -109,6 +110,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return UserStatusCode.InternalError;
 		}
 
+		// devices
 		public async Task<DeviceStatusCode> CreateDeviceAsync(UserInfo user, string deviceName)
 		{
 			string requestDescription = string.Format("CreateDeviceAsync(({0}, {1}), {2})", user.Login, user.Password, deviceName);
@@ -208,6 +210,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 
 		}
 
+		// settings
 		public async Task<ApiResult<SettingsStatusCode, SettingsResponse>> GetLastSettingsAsync(UserInfo user, DeviceInfo device)
 		{
 			string requestDescription = string.Format("GetLastSettingsAsync(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
@@ -335,6 +338,9 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return ApiResult.From<SettingsStatusCode, List<SettingsResponse>>(SettingsStatusCode.InternalError, null);
 		}
 
+
+		#region Private methods
+
 		private RequestResult<T> Deserialize<T>(string data, string requestDescription)
 		{
 			try
@@ -356,8 +362,6 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			_apiLogger.LogServerError(requestDescription, string.Format("Invalid json content to deserialize to RequestResult<{0}> : {1}", typeof(T), data));
 			return null;
 		}
-
-		#region Headers
 
 		private Dictionary<string, string> DefaultHeaders()
 		{

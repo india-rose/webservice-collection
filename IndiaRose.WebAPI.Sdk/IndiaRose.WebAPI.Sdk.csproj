@@ -53,6 +53,7 @@
     <Compile Include="Results\SettingsStatusCode.cs" />
     <Compile Include="Results\DeviceStatusCode.cs" />
     <Compile Include="Results\UserStatusCode.cs" />
+    <Compile Include="Results\VersionStatusCode.cs" />
     <Compile Include="Services\ApiLogger.cs" />
     <Compile Include="Services\ApiService.cs" />
     <Compile Include="Services\RequestServiceBase.cs" />

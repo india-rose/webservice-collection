@@ -117,11 +117,12 @@ Versions (ErrorCode 4XX) : /versions
 				pas d'erreur => List<VersionResponse> dans le Content de la réponse
 			}
 
-	Get /all/{fromVersionNumber} : récupère toutes les versions de l'utilisateur à partir d'une version en particulier (exclus)
+	Get /all/{fromVersionNumber} : récupère toutes les versions de l'utilisateur à partir d'une version en particulier (exclus) ]fromVersionNumber, lastVersionNumber]
 		paramètre requis : <none>
 		paramètre optionel : <none>
 
 		Code de retour : 
+			Http 400 (Bad request) => fromVersionNumber n'est pas un entier
 			Http 200 => {
 				pas d'erreur => List<VersionResponse> dans le Content de la réponse
 			}

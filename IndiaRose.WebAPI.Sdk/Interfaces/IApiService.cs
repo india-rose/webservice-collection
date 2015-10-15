@@ -82,5 +82,9 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 		/// <param name="device">device information</param>
 		/// <returns>status code + content result</returns>
 		Task<ApiResult<SettingsStatusCode, List<SettingsResponse>>> GetSettingsListAsync(UserInfo user, DeviceInfo device);
+
+
+		Task<ApiResult<VersionStatusCode, List<VersionResponse>>> GetVersions(UserInfo user, DeviceInfo device);
+
 	}
 }
