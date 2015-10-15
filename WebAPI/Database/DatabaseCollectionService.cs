@@ -71,9 +71,15 @@ namespace WebAPI.Database
 				return null;
 			}
 
+			return CreateIndiagramInfo(indiagram, version);
+		}
+
+		private IndiagramInfo CreateIndiagramInfo(Indiagram indiagram, long version)
+		{
 			IndiagramInfo info = indiagram.Infos.OrderByDescending(x => x.Version).FirstOrDefault(x => x.Version <= version);
 			if (info == null)
 			{
+				// no version available
 				return null;
 			}
 
@@ -82,42 +88,69 @@ namespace WebAPI.Database
 				return info;
 			}
 
-			// create new IndiagramInfo based on last version
-
+			// create IndiagramInfo based on last version available
+			return CreateIndiagramInfo(indiagram, info, version);
 		}
 
+		private IndiagramInfo CreateIndiagramInfo(Indiagram indiagram, IndiagramInfo old, long version)
+		{
+			IndiagramInfo info = _context.Set<IndiagramInfo>().Add(new IndiagramInfo
+			{
+				IndiagramId = indiagram.Id,
+				Version = version,
+				ParentId = old.ParentId,
+				Position = old.Position,
+				Text = old.Text,
+				SoundPath = old.SoundPath,
+				SoundHash = old.SoundHash,
+				ImagePath = old.ImagePath,
+				ImageHash = old.ImageHash,
+				IsCategory = old.IsCategory,
+			});
+			DbSet<IndiagramState> stateSet = _context.Set<IndiagramState>();
 
-		public Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest indiagram)
+			info.States = old.States.Select(x => stateSet.Add(
+				new IndiagramState
+				{
+					DeviceId = x.DeviceId,
+					IndiagramInfoId = info.Id,
+					IsEnabled = x.IsEnabled
+				})).ToList();
+
+			if (indiagram.LastIndiagramInfoId == null || indiagram.LastIndiagramInfo.Version < version)
+			{
+				indiagram.LastIndiagramInfoId = info.Id;
+			}
+
+			_context.SaveChanges();
+			return info;
+		}
+
+		public Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest request)
 		{
 			Indiagram result = _context.Indiagrams.Add(new Indiagram
 			{
-				UserId = userId,
+				UserId = userId
 			});
 
 			IndiagramInfo info = _context.Set<IndiagramInfo>().Add(new IndiagramInfo
 			{
-				//TODO : check if id is set when add is done are we need to call saveChanges
-
 				IndiagramId = result.Id,
-				IsCategory = indiagram.IsCategory,
-				ParentId = indiagram.ParentId,
-				Position = indiagram.Position,
-				Text = indiagram.Text,
-				Version = indiagram.Version
+				Version = request.Version,
+				ParentId = request.ParentId,
+				Position = request.Position,
+				Text = request.Text,
+				IsCategory = request.IsCategory
 			});
 
-			result.Infos = new List<IndiagramInfo> { info };
-			result.LastIndiagramInfo = info;
 			result.LastIndiagramInfoId = info.Id;
 
-			IndiagramState state = _context.Set<IndiagramState>().Add(new IndiagramState
+			_context.Set<IndiagramState>().Add(new IndiagramState
 			{
 				DeviceId = deviceId,
 				IndiagramInfoId = info.Id,
-				IsEnabled = indiagram.IsEnabled
+				IsEnabled = request.IsEnabled
 			});
-
-			info.States = new List<IndiagramState> { state };
 
 			_context.SaveChanges();
 			return result;
@@ -132,63 +165,29 @@ namespace WebAPI.Database
 				return null;
 			}
 
-			IndiagramInfo info = GetLastIndiagramInfo(userId, indiagram.Id, request.Version);
+			IndiagramInfo info = CreateIndiagramInfo(indiagram, request.Version);
 
-		}
+			info.ParentId = request.ParentId;
+			info.Position = request.Position;
+			info.Text = request.Text;
+			info.IsCategory = request.IsCategory;
 
-		
-		public IndiagramInfo CreateIndiagramInfo(long userId, long indiagramId, long version)
-		{
-			if (info == null)
+			IndiagramState state = info.States.FirstOrDefault(x => x.DeviceId == deviceId);
+			if (state != null)
 			{
-				// create the IndiagramInfo empty object
-				info = new IndiagramInfo
+				state.IsEnabled = request.IsEnabled;
+			}
+			else
+			{
+				_context.Set<IndiagramState>().Add(new IndiagramState
 				{
-					IndiagramId = indiagram.Id,
-					Version = version,
-					ParentId = -1,
-				};
-
-				info = _context.Set<IndiagramInfo>().Add(info);
-				_context.SaveChanges();
+					DeviceId = deviceId,
+					IndiagramInfoId = info.Id,
+					IsEnabled = request.IsEnabled
+				});
 			}
-			else if (info.Version > version)
-			{
-				return null; // can not modify old versions
-			}
-			else if (info.Version < version)
-			{
-				// create the IndiagramInfo object for version based on the last one
-				IndiagramInfo old = info;
-				info = new IndiagramInfo
-				{
-					IndiagramId = indiagram.Id,
-					Version = version,
-					ParentId = old.ParentId,
-					Position = old.Position,
-					Text = old.Text,
-					SoundPath = old.SoundPath,
-					SoundHash = old.SoundHash,
-					ImagePath = old.ImagePath,
-					ImageHash = old.ImageHash,
-					IsCategory = old.IsCategory,
-				};
-
-				info = _context.Set<IndiagramInfo>().Add(info);
-				DbSet<IndiagramState> stateSet = _context.Set<IndiagramState>();
-
-				info.States = old.States.Select(x => stateSet.Add(
-					new IndiagramState
-					{
-						DeviceId = x.DeviceId,
-						IndiagramInfoId = info.Id,
-						IsEnabled = x.IsEnabled
-					})).ToList();
-
-				_context.SaveChanges();
-			}
-
-			return info;
+			_context.SaveChanges();
+			return indiagram;
 		}
 
 		public void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent)
