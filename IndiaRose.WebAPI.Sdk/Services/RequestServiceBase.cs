@@ -57,7 +57,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return PostAsync(uri, string.Empty, headers);
 		}
 
-		public async Task<HttpResult> PostAsync(string uri, string content, Dictionary<string, string> headers = null)
+		public async Task<HttpResult> PostAsync(string uri, string content, Dictionary<string, string> headers = null, string contentType = "application/json")
 		{
 			HttpResult result = new HttpResult();
 			try
@@ -73,7 +73,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 
 				if (!string.IsNullOrWhiteSpace(content))
 				{
-					request.Content = new StringContent(content, Encoding.UTF8, "application/json");
+					request.Content = new StringContent(content, Encoding.UTF8, contentType);
 				}
 
 				using (HttpResponseMessage response = await Client.SendAsync(request))
@@ -90,7 +90,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return result;
 		}
 
-		public async Task<HttpResult> PostAsync(string uri, Stream content, Dictionary<string, string> headers = null)
+		public async Task<HttpResult> PostAsync(string uri, Stream content, string contentType, Dictionary<string, string> headers = null)
 		{
 			HttpResult result = new HttpResult();
 			try
@@ -105,7 +105,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 				}
 
 				request.Content = new StreamContent(content);
-				request.Content.Headers.Add("Content-Type", "application/json");
+				request.Content.Headers.Add("Content-Type", contentType);
 
 				using (HttpResponseMessage response = await Client.SendAsync(request))
 				{

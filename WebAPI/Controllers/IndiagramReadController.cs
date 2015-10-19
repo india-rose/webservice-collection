@@ -6,15 +6,12 @@ using System.Web.Http;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
 using WebAPI.Extensions;
-using WebAPI.Filters;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
 
 namespace WebAPI.Controllers
 {
-	[RoutePrefix("api/v1/collection")]
-	[ApiAuthentification(true)]
-	public class IndiagramReadController : IndiagramControllerBase
+	public partial class IndiagramController
 	{
 		[Route("all")]
 		[HttpGet]

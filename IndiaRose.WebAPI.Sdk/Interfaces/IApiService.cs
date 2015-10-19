@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
+using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
 namespace IndiaRose.WebAPI.Sdk.Interfaces
@@ -89,6 +90,12 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 		Task<ApiResult<VersionStatusCode, List<VersionResponse>>> GetVersions(UserInfo user, DeviceInfo device, long fromVersion);
 
 		Task<ApiResult<VersionStatusCode, VersionResponse>> CreateVersion(UserInfo user, DeviceInfo device);
+
+
+		//== collections ==
+		Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> UpdateIndiagram(UserInfo user, DeviceInfo device, IndiagramRequest indiagram);
+
+		Task<IndiagramStatusCode> UploadImage(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content);
 
 	}
 }

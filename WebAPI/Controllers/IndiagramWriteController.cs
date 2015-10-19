@@ -7,14 +7,11 @@ using System.Web.Http;
 using WebAPI.Common.Requests;
 using WebAPI.Database;
 using WebAPI.Extensions;
-using WebAPI.Filters;
 using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
-	[RoutePrefix("api/v1/collection")]
-	[ApiAuthentification(true)]
-	public class IndiagramWriteController : IndiagramControllerBase
+	public partial class IndiagramController
 	{
 		[Route("indiagrams/update")]
 		[HttpPost]
@@ -56,10 +53,39 @@ namespace WebAPI.Controllers
 
 		[Route("images/{id}/{versionNumber}")]
 		[HttpPost]
-		public async Task<HttpResponseMessage> PostImage([FromUri] string id, [FromUri] string versionNumber)
+		public HttpResponseMessage PostImage([FromUri] string id, [FromUri] string versionNumber, [FromBody] FileUploadRequest fileRequest)
 		{
-			return await PostFile(id, versionNumber, (database, indiagramInfo, filename, buffer) =>
+			using (IDatabaseService database = new DatabaseService())
 			{
+				User user = RequestContext.GetAuthenticatedUser();
+				long indiagramId;
+				long version;
+
+				if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+				{
+					return Request.CreateBadRequestResponse();
+				}
+
+				if (!database.HasIndiagramVersion(user.Id, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				IndiagramInfo indiagramInfo = database.GetLastIndiagramInfo(user.Id, indiagramId);
+
+				if (indiagramInfo == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				if (indiagramInfo.Version != version)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not modify old indiagram version");
+				}
+
+				string filename = fileRequest.Filename;
+				byte[] buffer = fileRequest.Content;
+
 				IStorageService storageService = new StorageService();
 				if (!storageService.UploadImage(indiagramInfo, buffer))
 				{
@@ -68,7 +94,7 @@ namespace WebAPI.Controllers
 
 				database.SetIndiagramImage(indiagramInfo, filename, buffer);
 				return Request.CreateEmptyGoodReponse();
-			});
+			}
 		}
 
 		[Route("sounds/{id}/{versionNumber}")]

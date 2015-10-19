@@ -142,6 +142,7 @@ namespace WebAPI.Database
 				Text = request.Text,
 				IsCategory = request.IsCategory
 			});
+			_context.SaveChanges();
 
 			result.LastIndiagramInfoId = info.Id;
 

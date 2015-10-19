@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="Requests\DeviceCreateRequest.cs" />
     <Compile Include="Requests\DeviceRenameRequest.cs" />
+    <Compile Include="Requests\FileUploadRequest.cs" />
     <Compile Include="Requests\IndiagramRequest.cs" />
     <Compile Include="Requests\SettingsUpdateRequest.cs" />
     <Compile Include="Requests\UserLoginRequest.cs" />

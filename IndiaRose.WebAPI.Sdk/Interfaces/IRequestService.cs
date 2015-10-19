@@ -11,8 +11,8 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 
 		Task<HttpResult> PostAsync(string uri, Dictionary<string, string> headers = null);
 
-		Task<HttpResult> PostAsync(string uri, string content, Dictionary<string, string> headers = null);
+		Task<HttpResult> PostAsync(string uri, string content, Dictionary<string, string> headers = null, string contentType = "application/json");
 
-		Task<HttpResult> PostAsync(string uri, Stream content, Dictionary<string, string> headers = null);
+		Task<HttpResult> PostAsync(string uri, Stream content, string contentType, Dictionary<string, string> headers = null);
 	}
 }

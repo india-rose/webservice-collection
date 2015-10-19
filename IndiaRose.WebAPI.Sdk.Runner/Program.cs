@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using IndiaRose.WebAPI.Sdk.Interfaces;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
 using IndiaRose.WebAPI.Sdk.Services;
+using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
 namespace IndiaRose.WebAPI.Sdk.Runner
@@ -132,6 +134,42 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				var v = vCreateResult.Content;
 				Console.WriteLine("\tVersion : {0}\n\tDate : {1}", v.Version, v.Date);
 			}
+			else
+			{
+				return;
+			}
+
+			var iCreateResult = await api.UpdateIndiagram(userInfo, device, new IndiagramRequest
+			{
+				Id = -1,
+				IsCategory = false,
+				IsEnabled = false,
+				ParentId = -1,
+				Position = 1,
+				Text = "Test image",
+				Version = vCreateResult.Content.Version
+			});
+			Console.WriteLine("Create indiagram : {0}", iCreateResult.Status);
+			if (iCreateResult.Content != null)
+			{
+				IndiagramResponse i = iCreateResult.Content;
+				Console.WriteLine("\tDatabaseId : {0}", i.DatabaseId);
+				Console.WriteLine("\tIsCategory : {0}", i.IsCategory);
+				Console.WriteLine("\tIsEnabled : {0}", i.IsEnabled);
+				Console.WriteLine("\tText : {0}", i.Text);
+				Console.WriteLine("\tPosition : {0}", i.Position);
+				Console.WriteLine("\tHasImage : {0}", i.HasImage);
+				Console.WriteLine("\tHasSound : {0}", i.HasSound);
+				Console.WriteLine("\tImageHash : {0}", i.ImageHash);
+				Console.WriteLine("\tSoundHash : {0}", i.SoundHash);
+			}
+			else
+			{
+				return;
+			}
+
+			var uploadResult = await api.UploadImage(userInfo, device, iCreateResult.Content.DatabaseId, vCreateResult.Content.Version, "robot.png", ReadImage());
+			Console.WriteLine("Upload image : {0}", uploadResult);
 		}
 
 		private static string ComputePasswordHash(string input)
@@ -142,6 +180,11 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				string hex = BitConverter.ToString(hash);
 				return hex.Replace("-", "").ToUpperInvariant();
 			}
+		}
+
+		private static byte[] ReadImage()
+		{
+			return File.ReadAllBytes("robot_image.png");
 		}
 	}
 }

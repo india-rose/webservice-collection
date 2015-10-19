@@ -50,6 +50,7 @@
     <Compile Include="Interfaces\IRequestService.cs" />
     <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\IndiagramStatusCode.cs" />
     <Compile Include="Results\SettingsStatusCode.cs" />
     <Compile Include="Results\DeviceStatusCode.cs" />
     <Compile Include="Results\UserStatusCode.cs" />

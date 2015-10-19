@@ -2,11 +2,14 @@
 using System.Linq;
 using System.Web.Http;
 using WebAPI.Common.Responses;
+using WebAPI.Filters;
 using WebAPI.ProcessModels;
 
 namespace WebAPI.Controllers
 {
-	public class IndiagramControllerBase : ApiController
+	[RoutePrefix("api/v1/collection")]
+	[ApiAuthentification(true)]
+	public partial class IndiagramController : ApiController
 	{
 		protected List<IndiagramResponse> GetCollectionTree(List<IndiagramForDevice> indiagrams)
 		{

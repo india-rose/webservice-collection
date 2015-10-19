@@ -27,5 +27,19 @@
 		public const string VERSIONS_ALL = VERSIONS_PREFIX + "/all";
 		public const string VERSIONS_ALL_FROM = VERSIONS_PREFIX + "/all/{0}";
 		public const string VERSIONS_CREATE = VERSIONS_PREFIX + "/create";
+
+		// collections
+		private const string COLLECTION_PREFIX = PREFIX + "/collection";
+		public const string COLLECTION_ALL = COLLECTION_PREFIX + "/all";
+		public const string COLLECTION_ALL_IN_VERSION = COLLECTION_PREFIX + "/all/{0}";
+		public const string INDIAGRAM_GET = COLLECTION_PREFIX + "/indiagrams/{0}";
+		public const string INDIAGRAM_GET_IN_VERSION = COLLECTION_PREFIX + "/indiagrams/{0}/{1}";
+		public const string IMAGE_GET = COLLECTION_PREFIX + "/images/{0}";
+		public const string IMAGE_GET_IN_VERSION = COLLECTION_PREFIX + "/images/{0}/{1}";
+		public const string SOUND_GET = COLLECTION_PREFIX + "/sounds/{0}";
+		public const string SOUND_GET_IN_VERSION = COLLECTION_PREFIX + "/sounds/{0}/{1}";
+		public const string INDIAGRAM_UPDATE = COLLECTION_PREFIX + "/indiagrams/update";
+		public const string IMAGE_UPLOAD = COLLECTION_PREFIX + "/images/{0}/{1}";
+		public const string SOUND_UPLOAD = COLLECTION_PREFIX + "/sounds/{0}/{1}";
 	}
 }

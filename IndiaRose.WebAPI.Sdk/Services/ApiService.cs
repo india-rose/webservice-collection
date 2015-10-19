@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using IndiaRose.WebAPI.Sdk.Interfaces;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
+using Newtonsoft.Json.Converters;
 using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
@@ -429,6 +432,82 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
 		}
 
+		// collections
+		public async Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> UpdateIndiagram(UserInfo user, DeviceInfo device, IndiagramRequest indiagram)
+		{
+			string requestDescription = string.Format("UpdateIndiagram(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, indiagram);
+			_apiLogger.LogRequest(requestDescription);
+
+			string requestContent = JsonConvert.SerializeObject(indiagram);
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.INDIAGRAM_UPDATE, requestContent, DeviceHeaders(user, device));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+				{
+					RequestResult<IndiagramResponse> requestResult = Deserialize<IndiagramResponse>(result.Content, requestDescription);
+					if (requestResult == null)
+					{
+						return ApiResult.From<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InternalError, null);
+					}
+					return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+				}
+				case HttpStatusCode.BadRequest:
+					return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.BadRequest, null);
+				case HttpStatusCode.Unauthorized:
+					return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.IndiagramNotFound, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InternalError, null);
+		}
+
+		public async Task<IndiagramStatusCode> UploadImage(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content)
+		{
+			string requestDescription = string.Format("UploadImage(({0}, {1}), ({2}), {3}, {4}, {5})", user.Login, user.Password, device.Name, indiagramId, versionNumber, filename);
+			_apiLogger.LogRequest(requestDescription);
+
+			
+			string requestContent = JsonConvert.SerializeObject(new FileUploadRequest
+			{
+				Filename = filename,
+				Content = content
+			});
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + string.Format(Uris.IMAGE_UPLOAD, indiagramId, versionNumber), requestContent, DeviceHeaders(user, device));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return IndiagramStatusCode.InternalError;
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					return IndiagramStatusCode.Ok;
+				case HttpStatusCode.BadRequest:
+					return IndiagramStatusCode.BadRequest;
+				case HttpStatusCode.Unauthorized:
+					return IndiagramStatusCode.InvalidLoginOrPassword;
+				case HttpStatusCode.Forbidden:
+					return IndiagramStatusCode.Forbidden;
+				case HttpStatusCode.NotFound:
+					return IndiagramStatusCode.IndiagramNotFound;
+				case HttpStatusCode.Conflict:
+					return IndiagramStatusCode.FileAlreadyExists;
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return IndiagramStatusCode.InternalError;
+		}
 
 		#region Private methods
 
