@@ -187,7 +187,9 @@ Collection (ErrorCode 5XX) : /collection
 		Code de retour : 
 			Http 400 (Bad request) => id n'est pas un entier
 			Http 404 (Not found) => id ne correspond pas à un indiagram existant
-			Http 200 (Ok) => fichier image dans la réponse
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
 
 	Get /images/{id}/{versionNumber} : récupère l'image pour une version d'un indiagram
 		paramètre requis : id (url), versionNumber (url)
@@ -196,7 +198,9 @@ Collection (ErrorCode 5XX) : /collection
 		Code de retour : 
 			Http 400 (Bad request) => id n'est pas un entier
 			Http 404 (Not found) => id ne correspond pas à un indiagram existant ou la version n'existe pas
-			Http 200 (Ok) => fichier image dans la réponse
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
 
 	Get /sounds/{id} : récupère la dernière version du son pour un indiagram
 		paramètre requis : id (url)
@@ -205,7 +209,9 @@ Collection (ErrorCode 5XX) : /collection
 		Code de retour : 
 			Http 400 (Bad request) => id n'est pas un entier
 			Http 404 (Not found) => id ne correspond pas à un indiagram existant
-			Http 200 (Ok) => fichier son dans la réponse
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
 
 	Get /sounds/{id}/{versionNumber} : récupère le son pour une version d'un indiagram
 		paramètre requis : id (url), versionNumber (url)
@@ -214,7 +220,9 @@ Collection (ErrorCode 5XX) : /collection
 		Code de retour : 
 			Http 400 (Bad request) => id n'est pas un entier
 			Http 404 (Not found) => id ne correspond pas à un indiagram existant ou la version n'existe pas
-			Http 200 (Ok) => fichier son dans la réponse
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
 
 	Post /indiagrams/update : met à jour ou créer un indiagram
 		paramètre requis : IndiagramRequest (body)

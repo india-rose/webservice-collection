@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
@@ -46,6 +47,35 @@ namespace WebAPI.Database
 			return true;
 		}
 
+		private byte[] DownloadFile(long indiagramId, long version, string containerName)
+		{
+			try
+			{
+				CloudBlobContainer container = _blobClient.GetContainerReference(containerName);
+				if (!container.Exists())
+				{
+					return null;
+				}
+
+				string filename = string.Format("{0}_{1}", indiagramId, version);
+
+				CloudBlockBlob blob = container.GetBlockBlobReference(filename);
+				if (!blob.Exists())
+				{
+					return null;
+				}
+				MemoryStream outputStream = new MemoryStream();
+				blob.DownloadToStream(outputStream);
+
+				return outputStream.ToArray();
+			}
+			catch (Exception e)
+			{
+				Trace.TraceError("Exception while downloading file from container {0} : {1}\n{2}", containerName, e.Message, e.StackTrace);
+			}
+			return null;
+		}
+
 		public bool UploadSound(IndiagramInfo indiagram, byte[] fileBuffer)
 		{
 			return UploadFile(indiagram, fileBuffer, SOUNDS_CONTAINER);
@@ -54,6 +84,16 @@ namespace WebAPI.Database
 		public bool UploadImage(IndiagramInfo indiagram, byte[] fileBuffer)
 		{
 			return UploadFile(indiagram, fileBuffer, IMAGES_CONTAINER);
+		}
+
+		public byte[] DownloadImage(long indiagramId, long version)
+		{
+			return DownloadFile(indiagramId, version, IMAGES_CONTAINER);
+		}
+
+		public byte[] DownloadSound(long indiagramId, long version)
+		{
+			return DownloadFile(indiagramId, version, SOUNDS_CONTAINER);
 		}
 	}
 }

@@ -59,12 +59,12 @@ namespace WebAPI.Controllers
 		public HttpResponseMessage Indiagram([FromUri] string id)
 		{
 			long indiagramId;
-			Device device = RequestContext.GetDevice();
 			if (!long.TryParse(id, out indiagramId))
 			{
 				return Request.CreateBadRequestResponse();
 			}
 
+			Device device = RequestContext.GetDevice();
 			using (IDatabaseService database = new DatabaseService())
 			{
 				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId);
@@ -112,28 +112,166 @@ namespace WebAPI.Controllers
 		[HttpGet]
 		public HttpResponseMessage Image([FromUri] string id)
 		{
-			throw new NotImplementedException();
+			long indiagramId;
+			if (!long.TryParse(id, out indiagramId))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			Device device = RequestContext.GetDevice();
+			using (IDatabaseService database = new DatabaseService())
+			{
+				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId);
+
+				if (resultIndiagram == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				if (string.IsNullOrWhiteSpace(resultIndiagram.ImageHash))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No image file");
+				}
+
+				IStorageService storageService = new StorageService();
+				byte[] content = storageService.DownloadImage(resultIndiagram.Id, resultIndiagram.Version);
+
+				if (content == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Error while downloading file");
+				}
+
+				return Request.CreateGoodReponse(new FileDownloadResponse
+				{
+					FileName = resultIndiagram.ImageFile,
+					Content = content
+				});
+			}
 		}
 
 		[Route("images/{id}/{versionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Image([FromUri] string id, [FromUri] string versionNumber)
 		{
-			throw new NotImplementedException();
+			long indiagramId;
+			long version;
+			if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			Device device = RequestContext.GetDevice();
+			using (IDatabaseService database = new DatabaseService())
+			{
+				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId, version);
+
+				if (resultIndiagram == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				if (string.IsNullOrWhiteSpace(resultIndiagram.ImageHash))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No image file");
+				}
+
+				IStorageService storageService = new StorageService();
+				byte[] content = storageService.DownloadImage(resultIndiagram.Id, resultIndiagram.Version);
+
+				if (content == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Error while downloading file");
+				}
+
+				return Request.CreateGoodReponse(new FileDownloadResponse
+				{
+					FileName = resultIndiagram.ImageFile,
+					Content = content
+				});
+			}
 		}
 
 		[Route("sounds/{id}")]
 		[HttpGet]
 		public HttpResponseMessage Sound([FromUri] string id)
 		{
-			throw new NotImplementedException();
+			long indiagramId;
+			if (!long.TryParse(id, out indiagramId))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			Device device = RequestContext.GetDevice();
+			using (IDatabaseService database = new DatabaseService())
+			{
+				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId);
+
+				if (resultIndiagram == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				if (string.IsNullOrWhiteSpace(resultIndiagram.SoundHash))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No sound file");
+				}
+
+				IStorageService storageService = new StorageService();
+				byte[] content = storageService.DownloadSound(resultIndiagram.Id, resultIndiagram.Version);
+
+				if (content == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Error while downloading file");
+				}
+
+				return Request.CreateGoodReponse(new FileDownloadResponse
+				{
+					FileName = resultIndiagram.ImageFile,
+					Content = content
+				});
+			}
 		}
 
 		[Route("sounds/{id}/{versionNumber}")]
 		[HttpGet]
 		public HttpResponseMessage Sound([FromUri] string id, [FromUri] string versionNumber)
 		{
-			throw new NotImplementedException();
+			long indiagramId;
+			long version;
+			if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			Device device = RequestContext.GetDevice();
+			using (IDatabaseService database = new DatabaseService())
+			{
+				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId, version);
+
+				if (resultIndiagram == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Indiagram not found");
+				}
+
+				if (string.IsNullOrWhiteSpace(resultIndiagram.SoundHash))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No sound file");
+				}
+
+				IStorageService storageService = new StorageService();
+				byte[] content = storageService.DownloadSound(resultIndiagram.Id, resultIndiagram.Version);
+
+				if (content == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Error while downloading file");
+				}
+
+				return Request.CreateGoodReponse(new FileDownloadResponse
+				{
+					FileName = resultIndiagram.ImageFile,
+					Content = content
+				});
+			}
 		}
 
 	}
