@@ -170,6 +170,26 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 
 			var uploadResult = await api.UploadImage(userInfo, device, iCreateResult.Content.DatabaseId, vCreateResult.Content.Version, "robot.png", ReadImage());
 			Console.WriteLine("Upload image : {0}", uploadResult);
+
+			iCreateResult = await api.GetIndiagram(userInfo, device, iCreateResult.Content.DatabaseId);
+			Console.WriteLine("Get indiagram : {0}", iCreateResult.Status);
+			if (iCreateResult.Content != null)
+			{
+				IndiagramResponse i = iCreateResult.Content;
+				Console.WriteLine("\tDatabaseId : {0}", i.DatabaseId);
+				Console.WriteLine("\tIsCategory : {0}", i.IsCategory);
+				Console.WriteLine("\tIsEnabled : {0}", i.IsEnabled);
+				Console.WriteLine("\tText : {0}", i.Text);
+				Console.WriteLine("\tPosition : {0}", i.Position);
+				Console.WriteLine("\tHasImage : {0}", i.HasImage);
+				Console.WriteLine("\tHasSound : {0}", i.HasSound);
+				Console.WriteLine("\tImageHash : {0}", i.ImageHash);
+				Console.WriteLine("\tSoundHash : {0}", i.SoundHash);
+			}
+			else
+			{
+				return;
+			}
 		}
 
 		private static string ComputePasswordHash(string input)

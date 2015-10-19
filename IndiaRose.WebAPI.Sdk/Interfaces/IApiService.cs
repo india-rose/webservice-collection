@@ -94,8 +94,14 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 
 		//== collections ==
 		Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> UpdateIndiagram(UserInfo user, DeviceInfo device, IndiagramRequest indiagram);
-
 		Task<IndiagramStatusCode> UploadImage(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content);
+		Task<IndiagramStatusCode> UploadSound(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content);
+
+		Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> GetIndiagram(UserInfo user, DeviceInfo device, long indiagramId, long version);
+		Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> GetIndiagram(UserInfo user, DeviceInfo device, long indiagramId);
+		Task<ApiResult<IndiagramStatusCode, List<IndiagramResponse>>> GetAllCollection(UserInfo user, DeviceInfo device, long version);
+		Task<ApiResult<IndiagramStatusCode, List<IndiagramResponse>>> GetAllCollection(UserInfo user, DeviceInfo device);
+
 
 	}
 }
