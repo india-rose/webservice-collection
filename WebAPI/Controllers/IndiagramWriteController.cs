@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web.Http;
 using WebAPI.Common.Requests;
 using WebAPI.Database;
@@ -99,36 +96,8 @@ namespace WebAPI.Controllers
 
 		[Route("sounds/{id}/{versionNumber}")]
 		[HttpPost]
-		public async Task<HttpResponseMessage> PostSound([FromUri] string id, [FromUri] string versionNumber)
+		public HttpResponseMessage PostSound([FromUri] string id, [FromUri] string versionNumber, [FromBody] FileUploadRequest fileRequest)
 		{
-			return await PostFile(id, versionNumber, (database, indiagramInfo, filename, buffer) =>
-			{
-				IStorageService storageService = new StorageService();
-				if (!storageService.UploadSound(indiagramInfo, buffer))
-				{
-					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Indiagram sound already exists and can't be replaced");
-				}
-
-				database.SetIndiagramSound(indiagramInfo, filename, buffer);
-				return Request.CreateEmptyGoodReponse();
-			});
-		}
-
-		protected async Task<HttpResponseMessage> PostFile(string id, string versionNumber, Func<IDatabaseService, IndiagramInfo, string, byte[], HttpResponseMessage> processFile)
-		{
-			if (!Request.Content.IsMimeMultipartContent())
-			{
-				return Request.CreateBadRequestResponse();
-			}
-
-			MultipartMemoryStreamProvider provider = new MultipartMemoryStreamProvider();
-			await Request.Content.ReadAsMultipartAsync(provider);
-
-			if (provider.Contents.Count != 1)
-			{
-				return Request.CreateBadRequestResponse();
-			}
-
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
@@ -157,13 +126,18 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not modify old indiagram version");
 				}
 
-				HttpContent file = provider.Contents.First();
-				string filename = file.Headers.ContentDisposition.FileName.Trim('\"');
-				byte[] buffer = await file.ReadAsByteArrayAsync();
+				string filename = fileRequest.Filename;
+				byte[] buffer = fileRequest.Content;
 
-				return processFile(database, indiagramInfo, filename, buffer);
+				IStorageService storageService = new StorageService();
+				if (!storageService.UploadSound(indiagramInfo, buffer))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Indiagram sound already exists and can't be replaced");
+				}
+
+				database.SetIndiagramSound(indiagramInfo, filename, buffer);
+				return Request.CreateEmptyGoodReponse();
 			}
 		}
-
 	}
 }

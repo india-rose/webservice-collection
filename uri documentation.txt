@@ -228,7 +228,7 @@ Collection (ErrorCode 5XX) : /collection
 			}
 
 	Post /images/{id}/{versionNumber} : upload une image pour un indiagram dans une version spécifiée
-		paramètre requis : id (url), versionNumber (url), imageFile (body)
+		paramètre requis : id (url), versionNumber (url), FileUploadRequest (body)
 		paramètre optionel : <none>
 
 		Code de retour : 
@@ -239,7 +239,7 @@ Collection (ErrorCode 5XX) : /collection
 			Http 200 (Ok) => image uploadée avec succés
 
 	Post /sounds/{id}/{versionNumber} : upload un son pour un indiagram dans une version spécifiée
-		paramètre requis : id (url), versionNumber (url), soundFile (body)
+		paramètre requis : id (url), versionNumber (url), FileUploadRequest (body)
 		paramètre optionel : <none>
 
 		Code de retour : 
