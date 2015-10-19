@@ -21,5 +21,11 @@
 		public const string SETTINGS_UPDATE = SETTINGS_PREFIX + "/update";
 		public const string SETTINGS_GET_VERSION = SETTINGS_PREFIX + "/get/{0}";
 		public const string SETTINGS_LIST = SETTINGS_PREFIX + "/all";
+
+		// versions
+		private const string VERSIONS_PREFIX = PREFIX + "/versions";
+		public const string VERSIONS_ALL = VERSIONS_PREFIX + "/all";
+		public const string VERSIONS_ALL_FROM = VERSIONS_PREFIX + "/all/{0}";
+		public const string VERSIONS_CREATE = VERSIONS_PREFIX + "/create";
 	}
 }

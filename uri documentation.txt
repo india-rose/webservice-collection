@@ -47,6 +47,7 @@ Devices (ErrorCode 2XX) : /devices
 		Code de retour
 			Http 400 (Bad request) => il manque un champ dans la requète
 			Http 404 (Not found) => pas de device trouvé avec ce nom
+			Http 409 (Conflict) => new name existe déjà
 			Http 202 (Accepted) => updated
 
 	GET /list : obtient la liste des devices de l'utilisateur

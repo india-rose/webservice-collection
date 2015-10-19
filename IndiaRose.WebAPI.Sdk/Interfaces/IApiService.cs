@@ -86,5 +86,9 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 
 		Task<ApiResult<VersionStatusCode, List<VersionResponse>>> GetVersions(UserInfo user, DeviceInfo device);
 
+		Task<ApiResult<VersionStatusCode, List<VersionResponse>>> GetVersions(UserInfo user, DeviceInfo device, long fromVersion);
+
+		Task<ApiResult<VersionStatusCode, VersionResponse>> CreateVersion(UserInfo user, DeviceInfo device);
+
 	}
 }

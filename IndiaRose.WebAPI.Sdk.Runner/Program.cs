@@ -102,9 +102,36 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				Console.WriteLine("\tVersion : {0}", sResult.Content.Version);
 				Console.WriteLine("\tData : {0}", sResult.Content.Settings);
 			}
-
-
+			
 			//Console.WriteLine("Got result {0}", result);
+
+			var vResult = await api.GetVersions(userInfo, device);
+			Console.WriteLine("GetVersions : {0}", vResult.Status);
+			if (vResult.Content != null)
+			{
+				foreach (var v in vResult.Content)
+				{
+					Console.WriteLine("\tVersion : {0}\n\tDate : {1}", v.Version, v.Date);
+				}
+			}
+
+			vResult = await api.GetVersions(userInfo, device, 2);
+			Console.WriteLine("GetVersionsFrom(2) : {0}", vResult.Status);
+			if (vResult.Content != null)
+			{
+				foreach (var v in vResult.Content)
+				{
+					Console.WriteLine("\tVersion : {0}\n\tDate : {1}", v.Version, v.Date);
+				}
+			}
+
+			var vCreateResult = await api.CreateVersion(userInfo, device);
+			Console.WriteLine("CreateVersion : {0}", vCreateResult.Status);
+			if (vCreateResult.Content != null)
+			{
+				var v = vCreateResult.Content;
+				Console.WriteLine("\tVersion : {0}\n\tDate : {1}", v.Version, v.Date);
+			}
 		}
 
 		private static string ComputePasswordHash(string input)

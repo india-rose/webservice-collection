@@ -52,6 +52,11 @@ namespace WebAPI.Controllers
 
 			using (IDatabaseService database = new DatabaseService())
 			{
+				if (database.HasDevice(user, device.NewName))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Device name already exists");
+				}
+
 				if (!database.UpdateDevice(user, device.ActualName, device.NewName))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Device name not found");

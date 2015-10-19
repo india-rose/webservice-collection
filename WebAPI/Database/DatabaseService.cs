@@ -148,12 +148,9 @@ namespace WebAPI.Database
 
 		public Version CreateVersion(long userId)
 		{
-			long lastVersion = 1;
-			if (_context.Versions.Any(x => x.UserId == userId))
-			{
-				lastVersion = _context.Versions.Where(x => x.UserId == userId).Max(x => x.Number);
-			}
-
+			Version lastVersionData = _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).FirstOrDefault();
+			long lastVersion = lastVersionData == null ? 1 : (lastVersionData.Number + 1);
+			
 			Version version = _context.Versions.Add(new Version
 			{
 				Date = DateTime.Now,
