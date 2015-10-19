@@ -53,7 +53,11 @@ namespace WebAPI.Controllers
 				IsCategory = indiagram.IsCategory,
 				SoundHash = indiagram.SoundHash,
 				Text = indiagram.Text,
-				Position = indiagram.Position
+				Position = indiagram.Position,
+				ImageFile = indiagram.ImageFile,
+				SoundFile = indiagram.SoundFile,
+				HasImage = !string.IsNullOrWhiteSpace(indiagram.ImageFile),
+				HasSound = !string.IsNullOrWhiteSpace(indiagram.SoundFile),
 			};
 		}
 	}

@@ -19,5 +19,9 @@
 		public bool IsCategory { get; set; }
 
 		public bool IsEnabled { get; set; }
+
+		public string SoundFile { get; set; }
+
+		public string ImageFile { get; set; }
 	}
 }

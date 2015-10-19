@@ -162,6 +162,8 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				Console.WriteLine("\tHasSound : {0}", i.HasSound);
 				Console.WriteLine("\tImageHash : {0}", i.ImageHash);
 				Console.WriteLine("\tSoundHash : {0}", i.SoundHash);
+				Console.WriteLine("\tImageFile : {0}", i.ImageFile);
+				Console.WriteLine("\tSoundFile : {0}", i.SoundFile);
 			}
 			else
 			{
@@ -185,6 +187,8 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				Console.WriteLine("\tHasSound : {0}", i.HasSound);
 				Console.WriteLine("\tImageHash : {0}", i.ImageHash);
 				Console.WriteLine("\tSoundHash : {0}", i.SoundHash);
+				Console.WriteLine("\tImageFile : {0}", i.ImageFile);
+				Console.WriteLine("\tSoundFile : {0}", i.SoundFile);
 			}
 			else
 			{

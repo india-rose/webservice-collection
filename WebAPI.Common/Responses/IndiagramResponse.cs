@@ -16,6 +16,10 @@ namespace WebAPI.Common.Responses
 
 		public string SoundHash { get; set; }
 
+		public string ImageFile { get; set; }
+
+		public string SoundFile { get; set; }
+
 		public int Position { get; set; }
 
 		public bool IsEnabled { get; set; }

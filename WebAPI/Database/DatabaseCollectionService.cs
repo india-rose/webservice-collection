@@ -262,7 +262,9 @@ namespace WebAPI.Database
 				SoundHash = info.SoundHash,
 				Text = info.Text,
 				Position = info.Position,
-				IsEnabled = state == null || state.IsEnabled
+				IsEnabled = state == null || state.IsEnabled,
+				ImageFile = info.ImagePath,
+				SoundFile = info.SoundPath
 			};
 		}
 
