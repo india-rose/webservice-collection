@@ -195,7 +195,13 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				return;
 			}
 
-
+			var downloadResult = await api.GetImage(userInfo, device, iCreateResult.Content.DatabaseId, vCreateResult.Content.Version);
+			Console.WriteLine("Download image : {0}", downloadResult.Status);
+			if (downloadResult.Content != null)
+			{
+				File.WriteAllBytes(string.Format("output-{0}", downloadResult.Content.FileName), downloadResult.Content.Content);
+				Console.WriteLine("Image output write to output-{0}", downloadResult.Content.FileName);
+			}
 		}
 
 		private static string ComputePasswordHash(string input)

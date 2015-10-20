@@ -102,6 +102,10 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 		Task<ApiResult<IndiagramStatusCode, List<IndiagramResponse>>> GetAllCollection(UserInfo user, DeviceInfo device, long version);
 		Task<ApiResult<IndiagramStatusCode, List<IndiagramResponse>>> GetAllCollection(UserInfo user, DeviceInfo device);
 
+		Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetImage(UserInfo user, DeviceInfo device, long indiagramId);
+		Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetImage(UserInfo user, DeviceInfo device, long indiagramId, long version);
+		Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetSound(UserInfo user, DeviceInfo device, long indiagramId);
+		Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetSound(UserInfo user, DeviceInfo device, long indiagramId, long version);
 
 	}
 }

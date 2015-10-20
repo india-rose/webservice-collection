@@ -676,6 +676,142 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return ApiResult.From<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InternalError, null);
 		}
 
+		public async Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetImage(UserInfo user, DeviceInfo device, long indiagramId)
+		{
+			string requestDescription = string.Format("GetImage(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, indiagramId);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + string.Format(Uris.IMAGE_GET, indiagramId), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<FileDownloadResponse> requestResult = Deserialize<FileDownloadResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+						}
+						return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.IndiagramNotFound, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.BadRequest, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetImage(UserInfo user, DeviceInfo device, long indiagramId, long version)
+		{
+			string requestDescription = string.Format("GetImage(({0}, {1}), ({2}), {3}, {4})", user.Login, user.Password, device.Name, indiagramId, version);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + string.Format(Uris.IMAGE_GET_IN_VERSION, indiagramId, version), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<FileDownloadResponse> requestResult = Deserialize<FileDownloadResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+						}
+						return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.IndiagramNotFound, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.BadRequest, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetSound(UserInfo user, DeviceInfo device, long indiagramId)
+		{
+			string requestDescription = string.Format("GetSound(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, indiagramId);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + string.Format(Uris.SOUND_GET, indiagramId), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<FileDownloadResponse> requestResult = Deserialize<FileDownloadResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+						}
+						return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.IndiagramNotFound, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.BadRequest, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<IndiagramStatusCode, FileDownloadResponse>> GetSound(UserInfo user, DeviceInfo device, long indiagramId, long version)
+		{
+			string requestDescription = string.Format("GetSound(({0}, {1}), ({2}), {3}, {4})", user.Login, user.Password, device.Name, indiagramId, version);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + string.Format(Uris.SOUND_GET_IN_VERSION, indiagramId, version), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<FileDownloadResponse> requestResult = Deserialize<FileDownloadResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+						}
+						return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.IndiagramNotFound, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.BadRequest, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<IndiagramStatusCode, FileDownloadResponse>(IndiagramStatusCode.InternalError, null);
+		}
+
 		#region Private methods
 
 		private RequestResult<T> Deserialize<T>(string data, string requestDescription)
