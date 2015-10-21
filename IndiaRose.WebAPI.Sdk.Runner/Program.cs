@@ -14,8 +14,8 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 {
 	class Program
 	{
-		//private const string HOST = "http://indiarose.azurewebsites.net";
-		private const string HOST = "http://localhost:59911";
+		private const string HOST = "http://indiarose.azurewebsites.net";
+		//private const string HOST = "http://localhost:59911";
 
 		static void Main(string[] args)
 		{

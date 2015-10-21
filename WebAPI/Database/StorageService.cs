@@ -18,7 +18,8 @@ namespace WebAPI.Database
 
 		public StorageService()
 		{
-			CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+			string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+			CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
 
 			_blobClient = storageAccount.CreateCloudBlobClient();
 		}
