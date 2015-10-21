@@ -137,9 +137,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Extensions\RequestExtensions.cs" />
-    <Compile Include="Migrations\201510051518404_Initial.cs" />
-    <Compile Include="Migrations\201510051518404_Initial.Designer.cs">
-      <DependentUpon>201510051518404_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201510211340277_Initial.cs" />
+    <Compile Include="Migrations\201510211340277_Initial.Designer.cs">
+      <DependentUpon>201510211340277_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Device.cs" />
@@ -164,15 +164,15 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201510051518404_Initial.resx">
-      <DependentUpon>201510051518404_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\WebAPI.Common\WebAPI.Common.csproj">
       <Project>{fb9dff28-bd4e-43dc-8893-c86df6aa7b81}</Project>
       <Name>WebAPI.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201510211340277_Initial.resx">
+      <DependentUpon>201510211340277_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
