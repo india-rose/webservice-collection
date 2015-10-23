@@ -1,0 +1,263 @@
+Root uri : /api/v1
+
+Utilisateurs (ErrorCode 1XX) : /users
+	POST /register : enregistrement d'un utilisateur
+		paramètres requis : login, email, password (sha256 hash)
+		paramètres optionels : <none>
+		
+		Code de retour
+			Http 400 (Bad request) => il manque un champ dans la requète
+			Http 200 (Ok) => {
+				errorCode 100 => Le login est déjà utilisé par un autre utilisateur
+				errorCode 101 => L'email est déjà utilisé par un autre utilisateur
+				pas d'erreur => L'utilisateur a été créé
+			}
+	POST /login : vérifier les informations de login d'un utilisateur
+		paramètre requis : login, password (sha256 hash)
+		paramètres optionels : <none>
+
+		Code de retour
+			Http 400 (Bad request) => il manque un champ dans la requète
+			Http 401 (Unauthorized) => authentification incorrecte
+			Http 200 (Ok) => {
+				pas d'erreur => L'utilisateur est loggé
+			}
+
+Toutes les autres requête nécessite de positionner les deux headers suivant : 
+	x-indiarose-login : le login de l'utilisateur
+	x-indiarose-password : le password de l'utilisateur en hash sha256
+
+	Code de retour
+		Http 401 (Unauthorized) => Authentification incorrecte
+
+Devices (ErrorCode 2XX) : /devices
+	POST /create : création d'un device
+		paramètre requis : name
+		paramètre optionels : <none>
+
+		Code de retour
+			Http 400 (Bad request) => il manque un champ dans la requète
+			Http 409 (Conflict) => ce nom existe déjà
+			Http 201 (Created) => created
+
+	POST /rename : renommage d'un device
+		paramètre requis : oldName, newName
+		paramètre optionels : <none>
+
+		Code de retour
+			Http 400 (Bad request) => il manque un champ dans la requète
+			Http 404 (Not found) => pas de device trouvé avec ce nom
+			Http 409 (Conflict) => new name existe déjà
+			Http 202 (Accepted) => updated
+
+	GET /list : obtient la liste des devices de l'utilisateur
+		paramètre requis : <none>
+		parmaètre optionels : <none>
+
+		Code de retour
+			Http 200 (Ok) => {
+				pas d'erreur => List<DeviceResponse> dans le Content de la réponse
+			}
+	
+Toutes les autres requête nécessite de positionner le header suivant : 
+	x-indiarose-device : le nom du device de l'utilisateur
+
+	Code de retour
+		Http 401 (Unauthorized) => Device incorrect
+
+
+Settings (ErrorCode 3XX) : /settings
+	GET /last : récupère la dernière version des settings pour ce device
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour 
+			Http 404 (Not found) => aucune version des settings n'est disponible
+			Http 200 (Ok) => {
+				pas d'erreur => SettingsResponse dans le Content de la réponse
+			}
+
+	POST /update : créé une nouvelle version des settings pour ce device
+		paramètre requis : settingsData (version serializer des settings)
+		paramètre optionel : <none>
+
+		Code de retour
+			Http 400 (Bad request) => paramètres incorrects
+			Http 500 (Server error) => impossible de sauvegarder les paramêtres
+			Http 200 (Ok) => {
+				pas d'erreur => SettingsResponse dans le Content de la réponse
+			}
+
+	GET /get/{versionNumber} : récupère une version particulière des settings
+		paramètre requis : versionNumber (url)
+		paramètre optionel : <none>
+
+		Code de retour
+			Http 400 (Bad request) => le numéro de version n'est pas un entier
+			Http 404 (Not found) => pas de settings existant pour cette version
+			Http 200 (Ok) => {
+				pas d'erreur => SettingsResponse dans le content de la réponse
+			}
+
+	GET /all : récupère toutes les versions des settings enregistré pour ce device
+		paramètre requis : <none>
+		paramètre optionel <none>
+
+		Code de retour
+			Http 200 (Ok) => {
+				pas d'erreur => List<SettingsResponse> dans le Content de la réponse
+			}
+
+Versions (ErrorCode 4XX) : /versions
+	Get /all : récupère toutes les versions de l'utilisateur
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 200 => {
+				pas d'erreur => List<VersionResponse> dans le Content de la réponse
+			}
+
+	Get /all/{fromVersionNumber} : récupère toutes les versions de l'utilisateur à partir d'une version en particulier (exclus) ]fromVersionNumber, lastVersionNumber]
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => fromVersionNumber n'est pas un entier
+			Http 200 => {
+				pas d'erreur => List<VersionResponse> dans le Content de la réponse
+			}
+
+	Post /create : créé une nouvelle version pour la collection
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 200 => {
+				pas d'erreur => VersionResponse dans le Content de la réponse
+			}
+
+Collection (ErrorCode 5XX) : /collection
+	GET /all : récupère toute la collection dans sa dernière version pour ce device
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour :
+			Http 200 => {
+				pas d'erreur => List<IndiagramResponse> dans le Content de la réponse
+			}
+
+	Get /all/{versionNumber} : récupère toute la collection dans une version particulière pour ce device
+		paramètre requis : versionNumber (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => versionNumber n'est pas un numéro
+			Http 404 (Not found) => versionNumber ne correspond pas à une version existante
+			Http 200 => {
+				pas d'erreur => List<IndiagramResponse> dans le Content de la réponse
+			}
+
+	Get /indiagrams/{id} : récupère les informations d'un indiagram dans sa dernière version
+		paramètre requis : id (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => id n'est pas un entier
+			Http 404 (Not found) => id ne correspond pas à un indiagram existant
+			Http 200 {
+				pas d'erreur => IndiagramResponse dans le Content de la réponse
+			}
+
+	Get /indiagrams/{id}/{versionNumber} : récupère les informations d'un indiagram dans une version particulière
+		paramètre requis : id (url), versionNumber (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => id n'est pas un entier
+			Http 404 (Not found) => id ne correspond pas à un indiagram existant ou la version n'existe pas
+			Http 200 {
+				pas d'erreur => IndiagramResponse dans le Content de la réponse
+			}
+
+	Get /images/{id} : récupère la dernière version de l'image pour un indiagram
+		paramètre requis : id (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => id n'est pas un entier
+			Http 404 (Not found) => id ne correspond pas à un indiagram existant
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
+
+	Get /images/{id}/{versionNumber} : récupère l'image pour une version d'un indiagram
+		paramètre requis : id (url), versionNumber (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => id n'est pas un entier
+			Http 404 (Not found) => id ne correspond pas à un indiagram existant ou la version n'existe pas
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
+
+	Get /sounds/{id} : récupère la dernière version du son pour un indiagram
+		paramètre requis : id (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => id n'est pas un entier
+			Http 404 (Not found) => id ne correspond pas à un indiagram existant
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
+
+	Get /sounds/{id}/{versionNumber} : récupère le son pour une version d'un indiagram
+		paramètre requis : id (url), versionNumber (url)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => id n'est pas un entier
+			Http 404 (Not found) => id ne correspond pas à un indiagram existant ou la version n'existe pas
+			Http 200 (Ok) => {
+				pas d'erreur => FileDownloadResponse dans le Content de la réponse
+			}
+
+	Post /indiagrams/update : met à jour ou créer un indiagram
+		paramètre requis : IndiagramRequest (body)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => le contenu n'est pas bon ou le texte de l'indiagram est vide
+			Http 404 (Not found) => La version ou l'indiagram demandé n'existe pas
+			Http 200 (Ok) => {
+				Pas d'erreur => IndiagramResponse dans le Content du résultat
+			}
+
+	Post /images/{id}/{versionNumber} : upload une image pour un indiagram dans une version spécifiée
+		paramètre requis : id (url), versionNumber (url), FileUploadRequest (body)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => le contenu de la requète n'est pas bon (pas de fichier, id ou versionNumber ne sont pas des entiers)
+			Http 403 (Forbidden) => Tentative de modifier une ancienne version d'un indiagram
+			Http 404 (Not found) => la version ou l'indiagram n'existe pas
+			Http 409 (Conflict) => L'image existe déjà pour l'indiagram dans cette version
+			Http 200 (Ok) => image uploadée avec succés
+
+	Post /sounds/{id}/{versionNumber} : upload un son pour un indiagram dans une version spécifiée
+		paramètre requis : id (url), versionNumber (url), FileUploadRequest (body)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => le contenu de la requète n'est pas bon (pas de fichier, id ou versionNumber ne sont pas des entiers)
+			Http 403 (Forbidden) => Tentative de modifier une ancienne version d'un indiagram
+			Http 404 (Not found) => la version ou l'indiagram n'existe pas
+			Http 409 (Conflict) => Le son existe déjà pour l'indiagram dans cette version
+			Http 200 (Ok) => son uploadée avec succés
+
+
+
+TODO : implement image/sound file hash to update only when needed
+TODO : add support for forbidden result when user is not the correct one

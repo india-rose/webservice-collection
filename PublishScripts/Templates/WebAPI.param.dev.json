@@ -1,0 +1,33 @@
+// Need to copy this file as WebAPI.param.prod.json
+{
+  "siteName": {
+    "value": "indiarose"
+  },
+  "hostingPlanName": {
+    "value": "indiarose"
+  },
+  "siteLocation": {
+    "value": "West Europe"
+  },
+  "sku": {
+    "value": "Free"
+  },
+  "workerSize": {
+    "value": "0"
+  },
+  "serverName": {
+    "value": "indiarose"
+  },
+  "serverLocation": {
+    "value": "West Europe"
+  },
+  "administratorLogin": {
+    "value": "indiarose"
+  },
+  "administratorLoginPassword": {
+    "value": "<insert password here>"
+  },
+  "databaseName": {
+    "value": "indiarose_db"
+  }
+}
