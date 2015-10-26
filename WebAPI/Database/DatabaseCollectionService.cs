@@ -233,6 +233,11 @@ namespace WebAPI.Database
 			if (!allowOpenedVersion && IsVersionOpen(device.UserId, info.Version))
 			{
 				info = indiagram.Infos.OrderByDescending(item => item.Version).FirstOrDefault(item => !IsVersionOpen(device.UserId, item.Version));
+
+				if (info == null)
+				{
+					return null;
+				}
 			}
 
 			return ToIndiagramForDevice(device, indiagram, info);
