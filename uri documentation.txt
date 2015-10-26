@@ -255,6 +255,22 @@ Collection (ErrorCode 5XX) : /collection
 				Pas d'erreur => IndiagramResponse dans le Content du résultat
 			}
 
+	Post /indiagrams/updates : met à jour ou créé plusieurs indiagrams
+		paramètre requis : List<IndiagramRequest> (body)
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => le contenu n'est pas bon ou le texte de l'indiagram est vide ou il y a des cycles dans la collection
+			Http 403 (Forbidden) => la version est fermée, impossible d'update
+			Http 404 (Not found) => La version ou l'indiagram demandé n'existe pas
+			Http 200 (Ok) => {
+				Pas d'erreur => List<MappedIndiagramResponse> dans le Content du résultat
+			}
+		Remarks : 
+			The input List of IndiagramRequest must not use -1 as Id.
+			All new indiagram must have an id < -1 and ParentId which depends of uncreated indiagram must
+			be set to there negative id. A mapping will be done during the request execution.
+
 	Post /images/{id}/{versionNumber} : upload une image pour un indiagram dans une version spécifiée
 		paramètre requis : id (url), versionNumber (url), FileUploadRequest (body)
 		paramètre optionel : <none>
