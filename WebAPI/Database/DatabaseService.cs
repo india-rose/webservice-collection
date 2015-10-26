@@ -195,12 +195,12 @@ namespace WebAPI.Database
 
 		public List<Version> GetVersions(long userId)
 		{
-			return _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).ToList();
+			return _context.Versions.Where(x => x.UserId == userId && !x.IsOpen).OrderByDescending(x => x.Number).ToList();
 		}
 
 		public List<Version> GetVersions(long userId, long startVersion)
 		{
-			return _context.Versions.Where(x => x.UserId == userId && x.Number > startVersion).OrderByDescending(x => x.Number).ToList();
+			return _context.Versions.Where(x => x.UserId == userId && x.Number > startVersion && !x.IsOpen).OrderByDescending(x => x.Number).ToList();
 		}
 
 		#endregion
