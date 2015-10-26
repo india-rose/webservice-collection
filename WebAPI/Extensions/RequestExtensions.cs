@@ -44,6 +44,11 @@ namespace WebAPI.Extensions
 			return request.CreateErrorResponse(HttpStatusCode.BadRequest, "Missing fields in request");
 		}
 
+		public static HttpResponseMessage CreateBadRequestResponse(this HttpRequestMessage request, string message)
+		{
+			return request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
+		}
+
 		public static string GetHeaderValue(this HttpRequestMessage request, string headerName)
 		{
 			IEnumerable<string> resultHeader;
