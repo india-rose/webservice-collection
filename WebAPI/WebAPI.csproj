@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AliveController.cs" />
     <Compile Include="Controllers\DeviceController.cs" />
     <Compile Include="Controllers\IndiagramWriteController.cs" />
     <Compile Include="Controllers\IndiagramControllerBase.cs" />

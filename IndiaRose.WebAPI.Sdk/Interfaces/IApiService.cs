@@ -10,6 +10,12 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 	public interface IApiService
 	{
 		/// <summary>
+		/// Check if webservice is alive
+		/// </summary>
+		/// <returns>True if success, false otherwise</returns>
+		Task<bool> IsAlive();
+
+		/// <summary>
 		/// Register a user on the api.
 		/// </summary>
 		/// <param name="login">user login</param>

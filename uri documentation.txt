@@ -1,5 +1,13 @@
 Root uri : /api/v1
 
+Alive : /
+	Get /alive : vérifie si le webservice répond
+		paramètre reqius : <none>
+		paramètre optionel : <none>
+
+		Code de retour
+			Http 200 (Ok) => Le webservice répond correctement
+
 Utilisateurs (ErrorCode 1XX) : /users
 	POST /register : enregistrement d'un utilisateur
 		paramètres requis : login, email, password (sha256 hash)
