@@ -4,6 +4,8 @@
 	{
 		private const string PREFIX = "/api/v1";
 
+		public const string ALIVE = PREFIX + "/alive";
+
 		// users
 		private const string USER_PREFIX = PREFIX + "/users";
 		public const string USER_REGISTER = USER_PREFIX + "/register";

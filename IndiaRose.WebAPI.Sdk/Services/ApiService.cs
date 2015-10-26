@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using IndiaRose.WebAPI.Sdk.Interfaces;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
-using Newtonsoft.Json.Converters;
 using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
@@ -25,6 +22,26 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			_requestService = requestService;
 			_apiLogger = logger;
 			_apiHost = apiHost;
+		}
+
+		public async Task<bool> IsAlive()
+		{
+			string requestDescription = "IsAlive()";
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + Uris.ALIVE, DefaultHeaders());
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return false;
+			}
+			if (result.StatusCode == HttpStatusCode.OK)
+			{
+				return true;
+			}
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return false;
 		}
 
 		// users
