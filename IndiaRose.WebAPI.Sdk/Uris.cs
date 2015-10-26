@@ -42,6 +42,7 @@
 		public const string SOUND_GET = COLLECTION_PREFIX + "/sounds/{0}";
 		public const string SOUND_GET_IN_VERSION = COLLECTION_PREFIX + "/sounds/{0}/{1}";
 		public const string INDIAGRAM_UPDATE = COLLECTION_PREFIX + "/indiagrams/update";
+		public const string INDIAGRAM_MULTI_UPDATE = COLLECTION_PREFIX + "/indiagrams/updates";
 		public const string IMAGE_UPLOAD = COLLECTION_PREFIX + "/images/{0}/{1}";
 		public const string SOUND_UPLOAD = COLLECTION_PREFIX + "/sounds/{0}/{1}";
 	}

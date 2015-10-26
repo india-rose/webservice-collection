@@ -16,7 +16,7 @@ namespace WebAPI.Controllers
 	{
 		[Route("indiagrams/update")]
 		[HttpPost]
-		public HttpResponseMessage CreateIndiagram([FromBody] IndiagramRequest request)
+		public HttpResponseMessage UpdateIndiagram([FromBody] IndiagramRequest request)
 		{
 			if (request == null || string.IsNullOrWhiteSpace(request.Text))
 			{
@@ -58,7 +58,7 @@ namespace WebAPI.Controllers
 		}
 
 		[Route("indiagrams/updates")]
-		public HttpResponseMessage CreateIndiagram([FromBody] List<IndiagramRequest> request)
+		public HttpResponseMessage UpdateIndiagrams([FromBody] List<IndiagramRequest> request)
 		{
 			if (request == null || request.Any(x => string.IsNullOrEmpty(x.Text)))
 			{

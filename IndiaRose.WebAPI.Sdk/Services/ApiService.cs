@@ -519,6 +519,43 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InternalError, null);
 		}
 
+		public async Task<ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>> UpdateIndiagrams(UserInfo user, DeviceInfo device, List<IndiagramRequest> indiagrams)
+		{
+			string requestDescription = string.Format("UpdateIndiagrams(({0}, {1}), ({2}), (Count = {3}))", user.Login, user.Password, device.Name, indiagrams.Count);
+			_apiLogger.LogRequest(requestDescription);
+
+			string requestContent = JsonConvert.SerializeObject(indiagrams);
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.INDIAGRAM_MULTI_UPDATE, requestContent, DeviceHeaders(user, device));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<List<MappedIndiagramResponse>> requestResult = Deserialize<List<MappedIndiagramResponse>>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InternalError, null);
+						}
+						return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.BadRequest:
+					return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.BadRequest, null);
+				case HttpStatusCode.Unauthorized:
+					return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.IndiagramNotFound, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InternalError, null);
+		}
+
 		public async Task<IndiagramStatusCode> UploadImage(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content)
 		{
 			string requestDescription = string.Format("UploadImage(({0}, {1}), ({2}), {3}, {4}, {5})", user.Login, user.Password, device.Name, indiagramId, versionNumber, filename);
