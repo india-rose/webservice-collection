@@ -180,6 +180,12 @@ namespace WebAPI.Database
 			return _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version) != null;
 		}
 
+		public bool IsVersionOpen(long userId, long version)
+		{
+			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+			return v != null && v.IsOpen;
+		}
+
 		public List<Version> GetVersions(long userId)
 		{
 			return _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).ToList();

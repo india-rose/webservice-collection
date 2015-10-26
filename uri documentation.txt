@@ -249,6 +249,7 @@ Collection (ErrorCode 5XX) : /collection
 
 		Code de retour : 
 			Http 400 (Bad request) => le contenu n'est pas bon ou le texte de l'indiagram est vide
+			Http 403 (Forbidden) => la version est fermée, impossible d'update
 			Http 404 (Not found) => La version ou l'indiagram demandé n'existe pas
 			Http 200 (Ok) => {
 				Pas d'erreur => IndiagramResponse dans le Content du résultat
@@ -260,7 +261,7 @@ Collection (ErrorCode 5XX) : /collection
 
 		Code de retour : 
 			Http 400 (Bad request) => le contenu de la requète n'est pas bon (pas de fichier, id ou versionNumber ne sont pas des entiers)
-			Http 403 (Forbidden) => Tentative de modifier une ancienne version d'un indiagram
+			Http 403 (Forbidden) => la version est fermée, impossible d'update
 			Http 404 (Not found) => la version ou l'indiagram n'existe pas
 			Http 409 (Conflict) => L'image existe déjà pour l'indiagram dans cette version
 			Http 200 (Ok) => image uploadée avec succés
@@ -271,7 +272,7 @@ Collection (ErrorCode 5XX) : /collection
 
 		Code de retour : 
 			Http 400 (Bad request) => le contenu de la requète n'est pas bon (pas de fichier, id ou versionNumber ne sont pas des entiers)
-			Http 403 (Forbidden) => Tentative de modifier une ancienne version d'un indiagram
+			Http 403 (Forbidden) => la version est fermée, impossible d'update
 			Http 404 (Not found) => la version ou l'indiagram n'existe pas
 			Http 409 (Conflict) => Le son existe déjà pour l'indiagram dans cette version
 			Http 200 (Ok) => son uploadée avec succés
