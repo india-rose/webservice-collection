@@ -162,6 +162,19 @@ namespace WebAPI.Database
 			return version;
 		}
 
+		public Version CloseVersion(long userId, long version)
+		{
+			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+			if (v == null)
+			{
+				return null;
+			}
+
+			v.IsOpen = false;
+			_context.SaveChanges();
+			return v;
+		}
+
 		public bool HasIndiagramVersion(long userId, long version)
 		{
 			return _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version) != null;

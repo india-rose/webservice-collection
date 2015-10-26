@@ -44,6 +44,7 @@ namespace WebAPI.Database
 
 		// collection versions
 		Version CreateVersion(long userId);
+		Version CloseVersion(long userId, long version);
 		bool HasIndiagramVersion(long userId, long version);
 		List<Version> GetVersions(long userId);
 		List<Version> GetVersions(long userId, long startVersion);

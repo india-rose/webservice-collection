@@ -145,6 +145,17 @@ Versions (ErrorCode 4XX) : /versions
 				pas d'erreur => VersionResponse dans le Content de la réponse
 			}
 
+	Post /close/{versionNumber} : ferme la version demandée
+		paramètre requis : <none>
+		paramètre optionel : <none>
+
+		Code de retour : 
+			Http 400 (Bad request) => versionNumber n'est pas un entier
+			Http 404 (Not found) => version non trouvée
+			Http 200 (Ok) => {
+				pas d'erreur => VersionResponse dans le Content de la réponse
+			}
+
 Collection (ErrorCode 5XX) : /collection
 	GET /all : récupère toute la collection dans sa dernière version pour ce device
 		paramètre requis : <none>
