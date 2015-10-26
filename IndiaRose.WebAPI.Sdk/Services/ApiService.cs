@@ -421,7 +421,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 
 		public async Task<ApiResult<VersionStatusCode, VersionResponse>> CreateVersion(UserInfo user, DeviceInfo device)
 		{
-			string requestDescription = string.Format("Create(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
+			string requestDescription = string.Format("CreateVersion(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
 			_apiLogger.LogRequest(requestDescription);
 
 			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.VERSIONS_CREATE, DeviceHeaders(user, device));
@@ -443,6 +443,38 @@ namespace IndiaRose.WebAPI.Sdk.Services
 					}
 				case HttpStatusCode.Unauthorized:
 					return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InvalidLoginOrPassword, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<VersionStatusCode, VersionResponse>> CloseVersion(UserInfo user, DeviceInfo device, long versionNumber)
+		{
+			string requestDescription = string.Format("CloseVersion(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, versionNumber);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + string.Format(Uris.VERSIONS_CLOSE, versionNumber), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<VersionResponse> requestResult = Deserialize<VersionResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
+						}
+						return ApiResult.From(VersionStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.BadRequest, null);
 			}
 
 			_apiLogger.LogServerError(requestDescription, result.Content);
