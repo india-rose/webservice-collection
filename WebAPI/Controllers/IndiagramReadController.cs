@@ -41,9 +41,8 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				Device device = RequestContext.GetDevice();
-				if (database.HasIndiagramVersion(device.UserId, version))
+				if (database.HasIndiagramVersion(device.UserId, version) && !database.IsVersionOpen(device.UserId, version))
 				{
-
 					List<IndiagramForDevice> collection = database.GetIndiagrams(device, version);
 					List<IndiagramResponse> indiagrams = GetCollectionTree(collection);
 
@@ -92,7 +91,7 @@ namespace WebAPI.Controllers
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				if (!database.HasIndiagramVersion(device.UserId, version))
+				if (!database.HasIndiagramVersion(device.UserId, version) || database.IsVersionOpen(device.UserId, version))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
 				}
@@ -163,6 +162,11 @@ namespace WebAPI.Controllers
 			Device device = RequestContext.GetDevice();
 			using (IDatabaseService database = new DatabaseService())
 			{
+				if (!database.HasIndiagramVersion(device.UserId, version) || database.IsVersionOpen(device.UserId, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
 				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId, version);
 
 				if (resultIndiagram == null)
@@ -246,6 +250,11 @@ namespace WebAPI.Controllers
 			Device device = RequestContext.GetDevice();
 			using (IDatabaseService database = new DatabaseService())
 			{
+				if (!database.HasIndiagramVersion(device.UserId, version) || database.IsVersionOpen(device.UserId, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
 				IndiagramForDevice resultIndiagram = database.GetIndiagram(device, indiagramId, version);
 
 				if (resultIndiagram == null)

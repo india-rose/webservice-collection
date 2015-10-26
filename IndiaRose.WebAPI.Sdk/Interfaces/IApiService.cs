@@ -97,6 +97,7 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 
 		Task<ApiResult<VersionStatusCode, VersionResponse>> CreateVersion(UserInfo user, DeviceInfo device);
 
+		Task<ApiResult<VersionStatusCode, VersionResponse>> CloseVersion(UserInfo user, DeviceInfo device, long versionNumber);
 
 		//== collections ==
 		Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> UpdateIndiagram(UserInfo user, DeviceInfo device, IndiagramRequest indiagram);

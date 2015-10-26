@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using WebAPI.Common.Responses;
@@ -48,12 +49,43 @@ namespace WebAPI.Controllers
 		public HttpResponseMessage CreateVersion()
 		{
 			User user = RequestContext.GetAuthenticatedUser();
+			Device device = RequestContext.GetDevice();
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				Version version = database.CreateVersion(user.Id);
+				Version version = database.CreateVersion(user.Id, device.Id);
 
 				return Request.CreateGoodReponse(ToResponse(version));
+			}
+		}
+
+		[Route("close/{versionNumber}")]
+		[HttpPost]
+		public HttpResponseMessage CloseVersion([FromUri] string versionNumber)
+		{
+			long version;
+			if (!long.TryParse(versionNumber, out version))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			User user = RequestContext.GetAuthenticatedUser();
+			Device device = RequestContext.GetDevice();
+
+			using (IDatabaseService database = new DatabaseService())
+			{
+				if (!database.HasIndiagramVersion(user.Id, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				Version v = database.CloseVersion(user.Id, device.Id, version);
+				if (v == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				return Request.CreateGoodReponse(ToResponse(v));
 			}
 		}
 

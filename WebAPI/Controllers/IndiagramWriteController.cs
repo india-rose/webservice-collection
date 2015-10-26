@@ -5,6 +5,7 @@ using WebAPI.Common.Requests;
 using WebAPI.Database;
 using WebAPI.Extensions;
 using WebAPI.Models;
+using WebAPI.ProcessModels;
 
 namespace WebAPI.Controllers
 {
@@ -27,22 +28,27 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "version not found");
 				}
 
+				if (!database.CanPushInVersion(device.UserId, device.Id, request.Version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not update in this version, version is closed or didn't created by this device");
+				}
+
 				if (request.Id < 0)
 				{
-					Indiagram indiagram = database.CreateIndiagram(device.UserId, device.Id, request);
-					return Request.CreateGoodReponse(ToResponse(database.GetIndiagram(device, indiagram.Id)));
+					IndiagramForDevice indiagram = database.CreateIndiagram(device.UserId, device.Id, request);
+					return Request.CreateGoodReponse(ToResponse(indiagram));
 				}
 				else
 				{
 					//update
-					Indiagram indiagram = database.UpdateIndiagram(device.UserId, device.Id, request);
+					IndiagramForDevice indiagram = database.UpdateIndiagram(device.UserId, device.Id, request);
 
 					if (indiagram == null)
 					{
 						return Request.CreateErrorResponse(HttpStatusCode.NotFound, "indiagram not found");
 					}
 
-					return Request.CreateGoodReponse(ToResponse(database.GetIndiagram(device, indiagram.Id)));
+					return Request.CreateGoodReponse(ToResponse(indiagram));
 				}
 				
 			}
@@ -55,6 +61,7 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
+				Device device = RequestContext.GetDevice();
 				long indiagramId;
 				long version;
 
@@ -66,6 +73,11 @@ namespace WebAPI.Controllers
 				if (!database.HasIndiagramVersion(user.Id, version))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				if (!database.CanPushInVersion(device.UserId, device.Id, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not update in this version, version is closed or didn't created by this device");
 				}
 
 				IndiagramInfo indiagramInfo = database.GetLastIndiagramInfo(user.Id, indiagramId);
@@ -101,6 +113,7 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
+				Device device = RequestContext.GetDevice();
 				long indiagramId;
 				long version;
 
@@ -112,6 +125,11 @@ namespace WebAPI.Controllers
 				if (!database.HasIndiagramVersion(user.Id, version))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				if (!database.CanPushInVersion(device.UserId, device.Id, version))
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not update in this version, version is closed or didn't created by this device");
 				}
 
 				IndiagramInfo indiagramInfo = database.GetLastIndiagramInfo(user.Id, indiagramId);

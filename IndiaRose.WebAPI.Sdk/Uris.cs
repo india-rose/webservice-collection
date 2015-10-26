@@ -29,6 +29,7 @@
 		public const string VERSIONS_ALL = VERSIONS_PREFIX + "/all";
 		public const string VERSIONS_ALL_FROM = VERSIONS_PREFIX + "/all/{0}";
 		public const string VERSIONS_CREATE = VERSIONS_PREFIX + "/create";
+		public const string VERSIONS_CLOSE = VERSIONS_PREFIX + "/close/{0}";
 
 		// collections
 		private const string COLLECTION_PREFIX = PREFIX + "/collection";
