@@ -155,7 +155,8 @@ namespace WebAPI.Database
 			{
 				Date = DateTime.Now,
 				Number = lastVersion,
-				UserId = userId
+				UserId = userId,
+				IsOpen = true,
 			});
 			_context.SaveChanges();
 			return version;

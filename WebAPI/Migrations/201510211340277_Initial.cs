@@ -99,6 +99,7 @@ namespace WebAPI.Migrations
                     {
                         Id = c.Long(nullable: false, identity: true),
                         UserId = c.Long(nullable: false),
+                        IsOpen = c.Boolean(nullable: false),
                         Number = c.Long(nullable: false),
                         Date = c.DateTime(nullable: false),
                     })
