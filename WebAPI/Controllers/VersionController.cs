@@ -49,10 +49,11 @@ namespace WebAPI.Controllers
 		public HttpResponseMessage CreateVersion()
 		{
 			User user = RequestContext.GetAuthenticatedUser();
+			Device device = RequestContext.GetDevice();
 
 			using (IDatabaseService database = new DatabaseService())
 			{
-				Version version = database.CreateVersion(user.Id);
+				Version version = database.CreateVersion(user.Id, device.Id);
 
 				return Request.CreateGoodReponse(ToResponse(version));
 			}
@@ -69,6 +70,7 @@ namespace WebAPI.Controllers
 			}
 
 			User user = RequestContext.GetAuthenticatedUser();
+			Device device = RequestContext.GetDevice();
 
 			using (IDatabaseService database = new DatabaseService())
 			{
@@ -77,7 +79,7 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
 				}
 
-				Version v = database.CloseVersion(user.Id, version);
+				Version v = database.CloseVersion(user.Id, device.Id, version);
 				if (v == null)
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");

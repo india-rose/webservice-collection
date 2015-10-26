@@ -28,9 +28,9 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "version not found");
 				}
 
-				if (!database.IsVersionOpen(device.UserId, request.Version))
+				if (!database.CanPushInVersion(device.UserId, device.Id, request.Version))
 				{
-					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Version is close, can not update content");
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not update in this version, version is closed or didn't created by this device");
 				}
 
 				if (request.Id < 0)
@@ -61,6 +61,7 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
+				Device device = RequestContext.GetDevice();
 				long indiagramId;
 				long version;
 
@@ -74,9 +75,9 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
 				}
 
-				if (!database.IsVersionOpen(user.Id, version))
+				if (!database.CanPushInVersion(device.UserId, device.Id, version))
 				{
-					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Version is close, can not update content");
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not update in this version, version is closed or didn't created by this device");
 				}
 
 				IndiagramInfo indiagramInfo = database.GetLastIndiagramInfo(user.Id, indiagramId);
@@ -112,6 +113,7 @@ namespace WebAPI.Controllers
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
+				Device device = RequestContext.GetDevice();
 				long indiagramId;
 				long version;
 
@@ -125,9 +127,9 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
 				}
 
-				if (!database.IsVersionOpen(user.Id, version))
+				if (!database.CanPushInVersion(device.UserId, device.Id, version))
 				{
-					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Version is close, can not update content");
+					return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Can not update in this version, version is closed or didn't created by this device");
 				}
 
 				IndiagramInfo indiagramInfo = database.GetLastIndiagramInfo(user.Id, indiagramId);

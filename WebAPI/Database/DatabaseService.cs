@@ -145,8 +145,8 @@ namespace WebAPI.Database
 		#endregion
 
 		#region collection versions
-
-		public Version CreateVersion(long userId)
+		
+		public Version CreateVersion(long userId, long deviceId)
 		{
 			Version lastVersionData = _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).FirstOrDefault();
 			long lastVersion = lastVersionData == null ? 1 : (lastVersionData.Number + 1);
@@ -157,15 +157,16 @@ namespace WebAPI.Database
 				Number = lastVersion,
 				UserId = userId,
 				IsOpen = true,
+				DeviceId = deviceId
 			});
 			_context.SaveChanges();
 			return version;
 		}
 
-		public Version CloseVersion(long userId, long version)
+		public Version CloseVersion(long userId, long deviceId, long version)
 		{
 			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
-			if (v == null)
+			if (v == null || v.DeviceId != deviceId)
 			{
 				return null;
 			}
@@ -184,6 +185,12 @@ namespace WebAPI.Database
 		{
 			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
 			return v != null && v.IsOpen;
+		}
+
+		public bool CanPushInVersion(long userId, long deviceId, long version)
+		{
+			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+			return v != null && v.IsOpen && v.DeviceId == deviceId;
 		}
 
 		public List<Version> GetVersions(long userId)

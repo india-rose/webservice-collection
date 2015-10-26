@@ -43,10 +43,11 @@ namespace WebAPI.Database
 		void SetIndiagramSound(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
 
 		// collection versions
-		Version CreateVersion(long userId);
-		Version CloseVersion(long userId, long version);
+		Version CreateVersion(long userId, long deviceId);
+		Version CloseVersion(long userId, long deviceId, long version);
 		bool HasIndiagramVersion(long userId, long version);
 		bool IsVersionOpen(long userId, long version);
+		bool CanPushInVersion(long userId, long deviceId, long version);
 		List<Version> GetVersions(long userId);
 		List<Version> GetVersions(long userId, long startVersion);
 	}
