@@ -30,6 +30,11 @@ namespace WebAPI.Database
 
 		private bool UploadFile(IndiagramInfo indiagram, byte[] fileBuffer, string containerName)
 		{
+			if (fileBuffer == null || string.IsNullOrEmpty(containerName) || indiagram == null)
+			{
+				return false;
+			}
+
 			try
 			{
 				CloudBlobContainer container = _blobClient.GetContainerReference(containerName);
