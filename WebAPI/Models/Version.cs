@@ -12,6 +12,8 @@ namespace WebAPI.Models
 		[Index]
 		public long UserId { get; set; }
 
+		public long DeviceId { get; set; }
+
 		public bool IsOpen { get; set; }
 
 		public virtual User User { get; set; }
