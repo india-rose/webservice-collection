@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>{id}</id>
+		<version>{version}</version>
+		<title>{id}</title>
+		<authors>{author}</authors>
+		<owners>{author}</owners>
+		<licenseUrl>https://github.com/india-rose/webservice-collection/blob/master/LICENSE</licenseUrl>
+		<projectUrl>https://github.com/india-rose/webservice-collection</projectUrl>
+		<iconUrl>https://avatars3.githubusercontent.com/u/15265862</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>C# implementation of sdk to contact india rose collection webapi</description>
+		<releaseNotes>Release {version} of sdk</releaseNotes>
+		<copyright>Copyright 2015</copyright>
+		<tags>indiarose</tags>
+		<dependencies>
+            <dependency id="Newtonsoft.Json" version="7.0.1" />
+			<dependency id="Microsoft.Net.Http" version="2.2.29" />
+        </dependencies>
+	</metadata>
+</package>

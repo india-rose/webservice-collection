@@ -15,7 +15,7 @@ namespace WebAPI.Database
 
 		public List<IndiagramForDevice> GetIndiagrams(Device device)
 		{
-			return GetIndiagramsUser(device.UserId).Select(x => ToIndiagramForDevice(device, x)).OrderBy(x => x.Position).ToList();
+			return GetIndiagramsUser(device.UserId).Select(x => ToIndiagramForDevice(device, x, false)).OrderBy(x => x.Position).ToList();
 		}
 
 		public List<IndiagramForDevice> GetIndiagrams(Device device, long version)
@@ -26,7 +26,7 @@ namespace WebAPI.Database
 		public IndiagramForDevice GetIndiagram(Device device, long id)
 		{
 			Indiagram indiagram = GetIndiagramUser(device.UserId, id);
-			return indiagram == null ? null : ToIndiagramForDevice(device, indiagram);
+			return indiagram == null ? null : ToIndiagramForDevice(device, indiagram, false);
 		}
 
 		public IndiagramForDevice GetIndiagram(Device device, long id, long version)
@@ -126,16 +126,16 @@ namespace WebAPI.Database
 			return info;
 		}
 
-		public Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest request)
+		public IndiagramForDevice CreateIndiagram(long userId, long deviceId, IndiagramRequest request)
 		{
-			Indiagram result = _context.Indiagrams.Add(new Indiagram
+			Indiagram indiagram = _context.Indiagrams.Add(new Indiagram
 			{
 				UserId = userId
 			});
 
 			IndiagramInfo info = _context.Set<IndiagramInfo>().Add(new IndiagramInfo
 			{
-				IndiagramId = result.Id,
+				IndiagramId = indiagram.Id,
 				Version = request.Version,
 				ParentId = request.ParentId,
 				Position = request.Position,
@@ -144,20 +144,21 @@ namespace WebAPI.Database
 			});
 			_context.SaveChanges();
 
-			result.LastIndiagramInfoId = info.Id;
+			indiagram.LastIndiagramInfoId = info.Id;
 
-			_context.Set<IndiagramState>().Add(new IndiagramState
+			IndiagramState state = _context.Set<IndiagramState>().Add(new IndiagramState
 			{
 				DeviceId = deviceId,
 				IndiagramInfoId = info.Id,
 				IsEnabled = request.IsEnabled
 			});
 
+
 			_context.SaveChanges();
-			return result;
+			return ToIndiagramForDevice(indiagram, info, state);
 		}
 
-		public Indiagram UpdateIndiagram(long userId, long deviceId, IndiagramRequest request)
+		public IndiagramForDevice UpdateIndiagram(long userId, long deviceId, IndiagramRequest request)
 		{
 			Indiagram indiagram = GetIndiagramUser(userId, request.Id);
 
@@ -188,7 +189,7 @@ namespace WebAPI.Database
 				});
 			}
 			_context.SaveChanges();
-			return indiagram;
+			return ToIndiagramForDevice(indiagram, info, state);
 		}
 
 		public void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent)
@@ -221,12 +222,22 @@ namespace WebAPI.Database
 
 		#region converter methods
 
-		private IndiagramForDevice ToIndiagramForDevice(Device device, Indiagram indiagram)
+		private IndiagramForDevice ToIndiagramForDevice(Device device, Indiagram indiagram, bool allowOpenedVersion)
 		{
 			IndiagramInfo info = indiagram.LastIndiagramInfo;
 			if (info == null)
 			{
 				return null;
+			}
+
+			if (!allowOpenedVersion && IsVersionOpen(device.UserId, info.Version))
+			{
+				info = indiagram.Infos.OrderByDescending(item => item.Version).FirstOrDefault(item => !IsVersionOpen(device.UserId, item.Version));
+
+				if (info == null)
+				{
+					return null;
+				}
 			}
 
 			return ToIndiagramForDevice(device, indiagram, info);

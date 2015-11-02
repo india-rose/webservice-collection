@@ -1,7 +1,6 @@
 namespace WebAPI.Migrations
 {
-    using System;
-    using System.Data.Entity.Migrations;
+	using System.Data.Entity.Migrations;
     
     public partial class Initial : DbMigration
     {
@@ -99,6 +98,8 @@ namespace WebAPI.Migrations
                     {
                         Id = c.Long(nullable: false, identity: true),
                         UserId = c.Long(nullable: false),
+                        DeviceId = c.Long(nullable: false),
+                        IsOpen = c.Boolean(nullable: false),
                         Number = c.Long(nullable: false),
                         Date = c.DateTime(nullable: false),
                     })

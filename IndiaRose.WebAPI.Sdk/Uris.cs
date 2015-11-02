@@ -4,6 +4,8 @@
 	{
 		private const string PREFIX = "/api/v1";
 
+		public const string ALIVE = PREFIX + "/alive";
+
 		// users
 		private const string USER_PREFIX = PREFIX + "/users";
 		public const string USER_REGISTER = USER_PREFIX + "/register";
@@ -27,6 +29,7 @@
 		public const string VERSIONS_ALL = VERSIONS_PREFIX + "/all";
 		public const string VERSIONS_ALL_FROM = VERSIONS_PREFIX + "/all/{0}";
 		public const string VERSIONS_CREATE = VERSIONS_PREFIX + "/create";
+		public const string VERSIONS_CLOSE = VERSIONS_PREFIX + "/close/{0}";
 
 		// collections
 		private const string COLLECTION_PREFIX = PREFIX + "/collection";
@@ -39,6 +42,7 @@
 		public const string SOUND_GET = COLLECTION_PREFIX + "/sounds/{0}";
 		public const string SOUND_GET_IN_VERSION = COLLECTION_PREFIX + "/sounds/{0}/{1}";
 		public const string INDIAGRAM_UPDATE = COLLECTION_PREFIX + "/indiagrams/update";
+		public const string INDIAGRAM_MULTI_UPDATE = COLLECTION_PREFIX + "/indiagrams/updates";
 		public const string IMAGE_UPLOAD = COLLECTION_PREFIX + "/images/{0}/{1}";
 		public const string SOUND_UPLOAD = COLLECTION_PREFIX + "/sounds/{0}/{1}";
 	}

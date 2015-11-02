@@ -19,6 +19,10 @@ namespace WebAPI.Database
 		public StorageService()
 		{
 			string connectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+#if DEBUG
+			Console.WriteLine("StorageConnectionString : {0}", connectionString);
+			Trace.TraceInformation("StorageConnectionString : {0}", connectionString);
+#endif
 			CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
 
 			_blobClient = storageAccount.CreateCloudBlobClient();
@@ -26,6 +30,11 @@ namespace WebAPI.Database
 
 		private bool UploadFile(IndiagramInfo indiagram, byte[] fileBuffer, string containerName)
 		{
+			if (fileBuffer == null || string.IsNullOrEmpty(containerName) || indiagram == null)
+			{
+				return false;
+			}
+
 			try
 			{
 				CloudBlobContainer container = _blobClient.GetContainerReference(containerName);

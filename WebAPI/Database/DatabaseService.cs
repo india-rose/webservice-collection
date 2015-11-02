@@ -145,8 +145,8 @@ namespace WebAPI.Database
 		#endregion
 
 		#region collection versions
-
-		public Version CreateVersion(long userId)
+		
+		public Version CreateVersion(long userId, long deviceId)
 		{
 			Version lastVersionData = _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).FirstOrDefault();
 			long lastVersion = lastVersionData == null ? 1 : (lastVersionData.Number + 1);
@@ -155,10 +155,25 @@ namespace WebAPI.Database
 			{
 				Date = DateTime.Now,
 				Number = lastVersion,
-				UserId = userId
+				UserId = userId,
+				IsOpen = true,
+				DeviceId = deviceId
 			});
 			_context.SaveChanges();
 			return version;
+		}
+
+		public Version CloseVersion(long userId, long deviceId, long version)
+		{
+			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+			if (v == null || v.DeviceId != deviceId)
+			{
+				return null;
+			}
+
+			v.IsOpen = false;
+			_context.SaveChanges();
+			return v;
 		}
 
 		public bool HasIndiagramVersion(long userId, long version)
@@ -166,14 +181,26 @@ namespace WebAPI.Database
 			return _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version) != null;
 		}
 
+		public bool IsVersionOpen(long userId, long version)
+		{
+			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+			return v != null && v.IsOpen;
+		}
+
+		public bool CanPushInVersion(long userId, long deviceId, long version)
+		{
+			Version v = _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+			return v != null && v.IsOpen && v.DeviceId == deviceId;
+		}
+
 		public List<Version> GetVersions(long userId)
 		{
-			return _context.Versions.Where(x => x.UserId == userId).OrderByDescending(x => x.Number).ToList();
+			return _context.Versions.Where(x => x.UserId == userId && !x.IsOpen).OrderByDescending(x => x.Number).ToList();
 		}
 
 		public List<Version> GetVersions(long userId, long startVersion)
 		{
-			return _context.Versions.Where(x => x.UserId == userId && x.Number > startVersion).OrderByDescending(x => x.Number).ToList();
+			return _context.Versions.Where(x => x.UserId == userId && x.Number > startVersion && !x.IsOpen).OrderByDescending(x => x.Number).ToList();
 		}
 
 		#endregion

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using IndiaRose.WebAPI.Sdk.Interfaces;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
-using Newtonsoft.Json.Converters;
 using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
@@ -25,6 +22,26 @@ namespace IndiaRose.WebAPI.Sdk.Services
 			_requestService = requestService;
 			_apiLogger = logger;
 			_apiHost = apiHost;
+		}
+
+		public async Task<bool> IsAlive()
+		{
+			string requestDescription = "IsAlive()";
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.GetAsync(_apiHost + Uris.ALIVE, DefaultHeaders());
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return false;
+			}
+			if (result.StatusCode == HttpStatusCode.OK)
+			{
+				return true;
+			}
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return false;
 		}
 
 		// users
@@ -404,7 +421,7 @@ namespace IndiaRose.WebAPI.Sdk.Services
 
 		public async Task<ApiResult<VersionStatusCode, VersionResponse>> CreateVersion(UserInfo user, DeviceInfo device)
 		{
-			string requestDescription = string.Format("Create(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
+			string requestDescription = string.Format("CreateVersion(({0}, {1}), ({2}))", user.Login, user.Password, device.Name);
 			_apiLogger.LogRequest(requestDescription);
 
 			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.VERSIONS_CREATE, DeviceHeaders(user, device));
@@ -426,6 +443,38 @@ namespace IndiaRose.WebAPI.Sdk.Services
 					}
 				case HttpStatusCode.Unauthorized:
 					return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InvalidLoginOrPassword, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<VersionStatusCode, VersionResponse>> CloseVersion(UserInfo user, DeviceInfo device, long versionNumber)
+		{
+			string requestDescription = string.Format("CloseVersion(({0}, {1}), ({2}), {3})", user.Login, user.Password, device.Name, versionNumber);
+			_apiLogger.LogRequest(requestDescription);
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + string.Format(Uris.VERSIONS_CLOSE, versionNumber), DeviceHeaders(user, device));
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<VersionResponse> requestResult = Deserialize<VersionResponse>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InternalError, null);
+						}
+						return ApiResult.From(VersionStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.Unauthorized:
+					return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.BadRequest:
+					return ApiResult.From<VersionStatusCode, VersionResponse>(VersionStatusCode.BadRequest, null);
 			}
 
 			_apiLogger.LogServerError(requestDescription, result.Content);
@@ -468,6 +517,43 @@ namespace IndiaRose.WebAPI.Sdk.Services
 
 			_apiLogger.LogServerError(requestDescription, result.Content);
 			return new ApiResult<IndiagramStatusCode, IndiagramResponse>(IndiagramStatusCode.InternalError, null);
+		}
+
+		public async Task<ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>> UpdateIndiagrams(UserInfo user, DeviceInfo device, List<IndiagramRequest> indiagrams)
+		{
+			string requestDescription = string.Format("UpdateIndiagrams(({0}, {1}), ({2}), (Count = {3}))", user.Login, user.Password, device.Name, indiagrams.Count);
+			_apiLogger.LogRequest(requestDescription);
+
+			string requestContent = JsonConvert.SerializeObject(indiagrams);
+
+			HttpResult result = await _requestService.PostAsync(_apiHost + Uris.INDIAGRAM_MULTI_UPDATE, requestContent, DeviceHeaders(user, device));
+
+			if (result.InnerException != null)
+			{
+				_apiLogger.LogError(requestDescription, result.InnerException);
+				return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InternalError, null);
+			}
+			switch (result.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					{
+						RequestResult<List<MappedIndiagramResponse>> requestResult = Deserialize<List<MappedIndiagramResponse>>(result.Content, requestDescription);
+						if (requestResult == null)
+						{
+							return ApiResult.From<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InternalError, null);
+						}
+						return ApiResult.From(IndiagramStatusCode.Ok, requestResult.Content);
+					}
+				case HttpStatusCode.BadRequest:
+					return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.BadRequest, null);
+				case HttpStatusCode.Unauthorized:
+					return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InvalidLoginOrPassword, null);
+				case HttpStatusCode.NotFound:
+					return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.IndiagramNotFound, null);
+			}
+
+			_apiLogger.LogServerError(requestDescription, result.Content);
+			return new ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>(IndiagramStatusCode.InternalError, null);
 		}
 
 		public async Task<IndiagramStatusCode> UploadImage(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content)

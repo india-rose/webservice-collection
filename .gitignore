@@ -198,3 +198,5 @@ FakesAssemblies/
 Thumbs.db
 *.userprefs
 
+Web.*.config
+nuget_build/

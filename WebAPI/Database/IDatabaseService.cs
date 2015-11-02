@@ -37,14 +37,17 @@ namespace WebAPI.Database
 		IndiagramInfo GetLastIndiagramInfo(long userId, long indiagramId);
 		IndiagramInfo GetIndiagramInfo(long userId, long indiagramId, long version);
 		IndiagramInfo CreateIndiagramInfo(long userId, long indiagramId, long version);
-		Indiagram CreateIndiagram(long userId, long deviceId, IndiagramRequest request);
-		Indiagram UpdateIndiagram(long userId, long deviceId, IndiagramRequest request);
+		IndiagramForDevice CreateIndiagram(long userId, long deviceId, IndiagramRequest request);
+		IndiagramForDevice UpdateIndiagram(long userId, long deviceId, IndiagramRequest request);
 		void SetIndiagramImage(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
 		void SetIndiagramSound(IndiagramInfo indiagramInfo, string filename, byte[] fileContent);
 
 		// collection versions
-		Version CreateVersion(long userId);
+		Version CreateVersion(long userId, long deviceId);
+		Version CloseVersion(long userId, long deviceId, long version);
 		bool HasIndiagramVersion(long userId, long version);
+		bool IsVersionOpen(long userId, long version);
+		bool CanPushInVersion(long userId, long deviceId, long version);
 		List<Version> GetVersions(long userId);
 		List<Version> GetVersions(long userId, long startVersion);
 	}

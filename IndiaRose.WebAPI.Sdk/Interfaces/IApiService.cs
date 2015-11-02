@@ -10,6 +10,12 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 	public interface IApiService
 	{
 		/// <summary>
+		/// Check if webservice is alive
+		/// </summary>
+		/// <returns>True if success, false otherwise</returns>
+		Task<bool> IsAlive();
+
+		/// <summary>
 		/// Register a user on the api.
 		/// </summary>
 		/// <param name="login">user login</param>
@@ -91,9 +97,11 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 
 		Task<ApiResult<VersionStatusCode, VersionResponse>> CreateVersion(UserInfo user, DeviceInfo device);
 
+		Task<ApiResult<VersionStatusCode, VersionResponse>> CloseVersion(UserInfo user, DeviceInfo device, long versionNumber);
 
 		//== collections ==
 		Task<ApiResult<IndiagramStatusCode, IndiagramResponse>> UpdateIndiagram(UserInfo user, DeviceInfo device, IndiagramRequest indiagram);
+		Task<ApiResult<IndiagramStatusCode, List<MappedIndiagramResponse>>> UpdateIndiagrams(UserInfo user, DeviceInfo device, List<IndiagramRequest> indiagrams);
 		Task<IndiagramStatusCode> UploadImage(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content);
 		Task<IndiagramStatusCode> UploadSound(UserInfo user, DeviceInfo device, long indiagramId, long versionNumber, string filename, byte[] content);
 
