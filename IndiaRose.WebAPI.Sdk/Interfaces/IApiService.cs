@@ -20,7 +20,7 @@ namespace IndiaRose.WebAPI.Sdk.Interfaces
 		/// </summary>
 		/// <param name="login">user login</param>
 		/// <param name="email">user email</param>
-		/// <param name="password">user password (sha 256)</param>
+		/// <param name="password">user password</param>
 		/// <returns>status code</returns>
 		Task<UserStatusCode> RegisterUserAsync(string login, string email, string password);
 
