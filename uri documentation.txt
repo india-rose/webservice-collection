@@ -10,7 +10,7 @@ Alive : /
 
 Utilisateurs (ErrorCode 1XX) : /users
 	POST /register : enregistrement d'un utilisateur
-		paramètres requis : login, email, password (sha256 hash)
+		paramètres requis : login, email, password
 		paramètres optionels : <none>
 		
 		Code de retour

@@ -1,5 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web.Http;
 using WebAPI.Common.Requests;
 using WebAPI.Database;
@@ -56,8 +60,18 @@ namespace WebAPI.Controllers
 					return Request.CreateCustomError(ERROR_CODE_EMAIL_EXISTS, ERROR_TEXT_EMAIL_EXISTS);
 				}
 				
-				database.RegisterUser(userInfo.Login, userInfo.Email, userInfo.Password);
+				database.RegisterUser(userInfo.Login, userInfo.Email, HashPassword(userInfo.Password));
 				return Request.CreateEmptyGoodReponse();
+			}
+		}
+
+		private string HashPassword(string passwd)
+		{
+			using (SHA256CryptoServiceProvider sha256 = new SHA256CryptoServiceProvider())
+			{
+				byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(passwd));
+				string hex = BitConverter.ToString(hash);
+				return hex.Replace("-", "").ToUpperInvariant();
 			}
 		}
 	}
