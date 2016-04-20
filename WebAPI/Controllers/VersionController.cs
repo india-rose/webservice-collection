@@ -1,12 +1,15 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Swashbuckle.Swagger.Annotations;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
 using WebAPI.Extensions;
 using WebAPI.Filters;
 using WebAPI.Models;
+using WebAPI.Swagger;
 
 namespace WebAPI.Controllers
 {
@@ -16,6 +19,9 @@ namespace WebAPI.Controllers
 	{
 		[Route("all")]
 		[HttpGet]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "List of all versions", typeof(RequestResult<List<VersionResponse>>))]
 		public HttpResponseMessage Versions()
 		{
 			User user = RequestContext.GetAuthenticatedUser();

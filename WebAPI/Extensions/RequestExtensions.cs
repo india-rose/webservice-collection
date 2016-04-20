@@ -8,6 +8,16 @@ namespace WebAPI.Extensions
 {
 	public static class RequestExtensions
 	{
+		public static HttpResponseMessage CreateCustomError(this HttpRequestMessage request, HttpStatusCode httpCode, int errorCode, string errorMessage)
+		{
+			return request.CreateResponse(httpCode, new RequestResult
+			{
+				HasError = true,
+				ErrorCode = errorCode,
+				ErrorMessage = errorMessage
+			});
+		}
+
 		public static HttpResponseMessage CreateCustomError(this HttpRequestMessage request, int errorCode, string errorMessage)
 		{
 			return request.CreateResponse(HttpStatusCode.OK, new RequestResult
