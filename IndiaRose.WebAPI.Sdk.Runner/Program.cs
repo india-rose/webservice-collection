@@ -7,6 +7,7 @@ using IndiaRose.WebAPI.Sdk.Interfaces;
 using IndiaRose.WebAPI.Sdk.Models;
 using IndiaRose.WebAPI.Sdk.Results;
 using IndiaRose.WebAPI.Sdk.Services;
+using Newtonsoft.Json;
 using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 
@@ -32,26 +33,28 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 			Console.WriteLine("Running...");
 
 			string passwd = ComputePasswordHash("rose");
-			UserStatusCode result = await api.RegisterUserAsync("india", "india@gmail.com", "rose");
+			UserStatusCode result;
+			/*
+			result = await api.RegisterUserAsync("india", "india@gmail.com", "rose");
 
 			Console.WriteLine("Result Code {0}", result);
-			
+			*/
 			result = await api.LoginUserAsync("india", passwd);
 
-			Console.WriteLine("Result Code {0}", result);
+			Console.WriteLine("Login Result Code {0}", result);
 
 			UserInfo badUserInfo = new UserInfo {Login = "test", Password = "test"};
 			UserInfo userInfo = new UserInfo{Login = "india", Password = passwd};
 			DeviceStatusCode dResult = await api.CreateDeviceAsync(badUserInfo, "test123");
 			Console.WriteLine("Create bad device : {0}", dResult);
-			dResult = await api.CreateDeviceAsync(userInfo, "test123");
+			dResult = await api.CreateDeviceAsync(userInfo, "azerty");
 			Console.WriteLine("Create good device : {0}", dResult);
 
 			ApiResult<DeviceStatusCode, List<DeviceResponse>> deviceListResult = await api.ListDevicesAsync(userInfo);
 			Console.WriteLine("Display devices : {0}", deviceListResult.Status);
 			deviceListResult.Content.ForEach(x => Console.WriteLine("\t{0}", x.Name));
 
-			dResult = await api.RenameDeviceAsync(userInfo, "test123", "test456");
+			dResult = await api.RenameDeviceAsync(userInfo, "azerty", "uiopml");
 			Console.WriteLine("Rename device : {0}", dResult);
 
 			deviceListResult = await api.ListDevicesAsync(userInfo);
@@ -60,7 +63,7 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 
 			DeviceInfo device = new DeviceInfo
 			{
-				Name = "test456"
+				Name = "test123"
 			};
 			var sResult = await api.GetLastSettingsAsync(userInfo, device);
 			Console.WriteLine("Get Settings : {0}", sResult.Status);
@@ -71,7 +74,7 @@ namespace IndiaRose.WebAPI.Sdk.Runner
 				Console.WriteLine("\tData : {0}", sResult.Content.Settings);
 			}
 
-			var updateResult = await api.UpdateSettingsAsync(userInfo, device, "test settings v1");
+			var updateResult = await api.UpdateSettingsAsync(userInfo, device, JsonConvert.SerializeObject(new SettingsModel()));
 			Console.WriteLine("update settings : {0}", updateResult);
 
 			sResult = await api.GetLastSettingsAsync(userInfo, device);

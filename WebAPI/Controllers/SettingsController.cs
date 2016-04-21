@@ -59,7 +59,7 @@ namespace WebAPI.Controllers
 		[SwaggerResponse(HttpStatusCode.InternalServerError, "Unable to save settings", typeof(RequestResult))]
 		public HttpResponseMessage Update([FromBody] SettingsUpdateRequest settingsData)
 		{
-			if (string.IsNullOrWhiteSpace(settingsData.Data))
+			if (string.IsNullOrWhiteSpace(settingsData?.Data))
 			{
 				return Request.CreateBadRequestResponse();
 			}

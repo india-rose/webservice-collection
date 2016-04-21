@@ -32,7 +32,7 @@ namespace WebAPI.Controllers
 		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
 		public HttpResponseMessage CreateDevice([FromBody] DeviceCreateRequest device)
 		{
-			if (string.IsNullOrWhiteSpace(device.Name))
+			if (string.IsNullOrWhiteSpace(device?.Name))
 			{
 				return Request.CreateBadRequestResponse();
 			}
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
 		[HttpPost]
 		public HttpResponseMessage RenameDevice([FromBody] DeviceRenameRequest device)
 		{
-			if (string.IsNullOrWhiteSpace(device.ActualName) || string.IsNullOrWhiteSpace(device.NewName))
+			if (string.IsNullOrWhiteSpace(device?.ActualName) || string.IsNullOrWhiteSpace(device.NewName))
 			{
 				return Request.CreateBadRequestResponse();
 			}

@@ -33,7 +33,7 @@ namespace WebAPI.Controllers
 		[SwaggerResponse(HttpStatusCode.OK, "Login success", typeof(RequestResult))]
 		public HttpResponseMessage Login([FromBody] UserLoginRequest userInfo)
 		{
-			if (string.IsNullOrWhiteSpace(userInfo.Login) || string.IsNullOrWhiteSpace(userInfo.Password))
+			if (string.IsNullOrWhiteSpace(userInfo?.Login) || string.IsNullOrWhiteSpace(userInfo.Password))
 			{
 				return Request.CreateBadRequestResponse();
 			}
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
 		[SwaggerResponse(HttpStatusCode.OK, "Register success", typeof(RequestResult))]
 		public HttpResponseMessage Register([FromBody] UserRegisterRequest userInfo)
 		{
-			if (string.IsNullOrWhiteSpace(userInfo.Login) || string.IsNullOrWhiteSpace(userInfo.Email) || string.IsNullOrWhiteSpace(userInfo.Password))
+			if (string.IsNullOrWhiteSpace(userInfo?.Login) || string.IsNullOrWhiteSpace(userInfo.Email) || string.IsNullOrWhiteSpace(userInfo.Password))
 			{
 				return Request.CreateBadRequestResponse();
 			}

@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
 		[HttpPost]
 		public HttpResponseMessage UpdateIndiagram([FromBody] IndiagramRequest request)
 		{
-			if (request == null || string.IsNullOrWhiteSpace(request.Text))
+			if (string.IsNullOrWhiteSpace(request?.Text))
 			{
 				return Request.CreateBadRequestResponse();
 			}
@@ -164,18 +164,24 @@ namespace WebAPI.Controllers
 		[HttpPost]
 		public HttpResponseMessage PostImage([FromUri] string id, [FromUri] string versionNumber, [FromBody] FileUploadRequest fileRequest)
 		{
+			long indiagramId;
+			long version;
+
+			if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			if (string.IsNullOrEmpty(fileRequest?.Filename) || fileRequest.Content.Length == 0)
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
 				Device device = RequestContext.GetDevice();
-				long indiagramId;
-				long version;
-
-				if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
-				{
-					return Request.CreateBadRequestResponse();
-				}
-
+				
 				if (!database.HasIndiagramVersion(user.Id, version))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
@@ -216,18 +222,24 @@ namespace WebAPI.Controllers
 		[HttpPost]
 		public HttpResponseMessage PostSound([FromUri] string id, [FromUri] string versionNumber, [FromBody] FileUploadRequest fileRequest)
 		{
+			long indiagramId;
+			long version;
+
+			if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
+			if (string.IsNullOrEmpty(fileRequest?.Filename) || fileRequest.Content.Length == 0)
+			{
+				return Request.CreateBadRequestResponse();
+			}
+
 			using (IDatabaseService database = new DatabaseService())
 			{
 				User user = RequestContext.GetAuthenticatedUser();
 				Device device = RequestContext.GetDevice();
-				long indiagramId;
-				long version;
-
-				if (!long.TryParse(id, out indiagramId) || !long.TryParse(versionNumber, out version))
-				{
-					return Request.CreateBadRequestResponse();
-				}
-
+				
 				if (!database.HasIndiagramVersion(user.Id, version))
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
