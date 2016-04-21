@@ -17,6 +17,10 @@ namespace WebAPI.Controllers
 	[ApiAuthentification(true)]
 	public class VersionController : ApiController
 	{
+		/// <summary>
+		/// List all versions available for the collection.
+		/// </summary>
+		/// <returns></returns>
 		[Route("all")]
 		[HttpGet]
 		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
@@ -32,8 +36,17 @@ namespace WebAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// List all version from a specific number to the last one.
+		/// </summary>
+		/// <param name="fromVersionNumber">The minimal version.</param>
+		/// <returns></returns>
 		[Route("all/{fromVersionNumber}")]
 		[HttpGet]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "List of all versions", typeof(RequestResult<List<VersionResponse>>))]
+		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields", typeof(RequestResult))]
 		public HttpResponseMessage Versions([FromUri] string fromVersionNumber)
 		{
 			long fromVersion;
@@ -50,8 +63,15 @@ namespace WebAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Create a new version for the collection.
+		/// </summary>
+		/// <returns></returns>
 		[Route("create")]
 		[HttpPost]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "Get the new version", typeof(RequestResult<VersionResponse>))]
 		public HttpResponseMessage CreateVersion()
 		{
 			User user = RequestContext.GetAuthenticatedUser();
@@ -65,8 +85,18 @@ namespace WebAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Close a version to commit all modifications.
+		/// </summary>
+		/// <remarks>You'll be no longer able to save modifications for this version.</remarks>
+		/// <param name="versionNumber">The version to close.</param>
+		/// <returns></returns>
 		[Route("close/{versionNumber}")]
 		[HttpPost]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "List of all versions", typeof(RequestResult<List<VersionResponse>>))]
+		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields", typeof(RequestResult))]
 		public HttpResponseMessage CloseVersion([FromUri] string versionNumber)
 		{
 			long version;
