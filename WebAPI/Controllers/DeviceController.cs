@@ -94,7 +94,6 @@ namespace WebAPI.Controllers
 		[Route("list")]
 		[HttpGet]
 		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
-		[ResponseType(typeof(RequestResult<List<DeviceResponse>>))]
 		[SwaggerResponse(HttpStatusCode.OK, "Get the list of device response", typeof(RequestResult<List<DeviceResponse>>))]
 		public HttpResponseMessage ListDevices()
 		{

@@ -3,19 +3,33 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Swashbuckle.Swagger.Annotations;
 using WebAPI.Common.Requests;
 using WebAPI.Common.Responses;
 using WebAPI.Database;
 using WebAPI.Extensions;
 using WebAPI.Models;
 using WebAPI.ProcessModels;
+using WebAPI.Swagger;
 
 namespace WebAPI.Controllers
 {
 	public partial class IndiagramController
 	{
+		/// <summary>
+		/// Update or create an indiagram.
+		/// </summary>
+		/// <remarks>Set the id to number &lt; 0 if you want to create a new indiagram.</remarks>
+		/// <param name="request">Indiagram data.</param>
+		/// <returns></returns>
 		[Route("indiagrams/update")]
 		[HttpPost]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "The updated or created indiagram.", typeof(RequestResult<IndiagramResponse>))]
+		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.NotFound, "Version or indiagram not found.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Forbidden, "Can not update this version", typeof(RequestResult))]
 		public HttpResponseMessage UpdateIndiagram([FromBody] IndiagramRequest request)
 		{
 			if (string.IsNullOrWhiteSpace(request?.Text))
@@ -57,7 +71,20 @@ namespace WebAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Update multiple indiagram at the same time.
+		/// </summary>
+		/// <remarks>The returned response map all sent ids to database ids.</remarks>
+		/// <param name="request">Data of the update.</param>
+		/// <returns></returns>
 		[Route("indiagrams/updates")]
+		[HttpPost]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "Update and creation done.", typeof(RequestResult<List<MappedIndiagramResponse>>))]
+		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields or invalid request.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.NotFound, "Version or indiagram not found.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Forbidden, "Can not update this version", typeof(RequestResult))]
 		public HttpResponseMessage UpdateIndiagrams([FromBody] List<IndiagramRequest> request)
 		{
 			if (request == null || request.Any(x => string.IsNullOrEmpty(x.Text)))
@@ -160,8 +187,22 @@ namespace WebAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Update image for an indiagram.
+		/// </summary>
+		/// <param name="id">The indiagram id.</param>
+		/// <param name="versionNumber">The version number.</param>
+		/// <param name="fileRequest">Image data.</param>
+		/// <returns></returns>
 		[Route("images/{id}/{versionNumber}")]
 		[HttpPost]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "Upload done.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.NotFound, "Version or indiagram not found.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Forbidden, "Can not update this version", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Conflict, "Image has already been updated for this version", typeof(RequestResult))]
 		public HttpResponseMessage PostImage([FromUri] string id, [FromUri] string versionNumber, [FromBody] FileUploadRequest fileRequest)
 		{
 			long indiagramId;
@@ -218,8 +259,22 @@ namespace WebAPI.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Update sound for an indiagram.
+		/// </summary>
+		/// <param name="id">The indiagram id.</param>
+		/// <param name="versionNumber">The version number.</param>
+		/// <param name="fileRequest">Sound data.</param>
+		/// <returns></returns>
 		[Route("sounds/{id}/{versionNumber}")]
 		[HttpPost]
+		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
+		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
+		[SwaggerResponse(HttpStatusCode.OK, "Upload done.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.NotFound, "Version or indiagram not found.", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Forbidden, "Can not update this version", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Conflict, "Sound has already been updated for this version", typeof(RequestResult))]
 		public HttpResponseMessage PostSound([FromUri] string id, [FromUri] string versionNumber, [FromBody] FileUploadRequest fileRequest)
 		{
 			long indiagramId;

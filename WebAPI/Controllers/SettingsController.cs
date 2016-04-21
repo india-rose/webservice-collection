@@ -27,7 +27,6 @@ namespace WebAPI.Controllers
 		[HttpGet]
 		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
 		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
-		[ResponseType(typeof(RequestResult<SettingsResponse>))]
 		[SwaggerResponse(HttpStatusCode.OK, "Get the last version of setting", typeof(RequestResult<SettingsResponse>))]
 		[SwaggerResponse(HttpStatusCode.NotFound, "No settings available", typeof(RequestResult))]
 		public HttpResponseMessage Last()
