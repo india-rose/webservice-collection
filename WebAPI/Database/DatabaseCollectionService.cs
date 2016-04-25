@@ -15,12 +15,12 @@ namespace WebAPI.Database
 
 		public List<IndiagramForDevice> GetIndiagrams(Device device)
 		{
-			return GetIndiagramsUser(device.UserId).Select(x => ToIndiagramForDevice(device, x, false)).OrderBy(x => x.Position).ToList();
+			return GetIndiagramsUser(device.UserId).Select(x => ToIndiagramForDevice(device, x, false)).Where(x => x != null).OrderBy(x => x.Position).ToList();
 		}
 
 		public List<IndiagramForDevice> GetIndiagrams(Device device, long version)
 		{
-			return GetIndiagramsUser(device.UserId).Select(x => ToIndiagramForDevice(device, x, version)).OrderBy(x => x.Position).ToList();
+			return GetIndiagramsUser(device.UserId).Select(x => ToIndiagramForDevice(device, x, version)).Where(x => x != null).OrderBy(x => x.Position).ToList();
 		}
 
 		public IndiagramForDevice GetIndiagram(Device device, long id)

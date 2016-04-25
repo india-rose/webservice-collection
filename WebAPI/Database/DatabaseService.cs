@@ -203,6 +203,11 @@ namespace WebAPI.Database
 			return _context.Versions.Where(x => x.UserId == userId && x.Number > startVersion && !x.IsOpen).OrderByDescending(x => x.Number).ToList();
 		}
 
+		public Version GetVersion(long userId, long deviceId, long version)
+		{
+			return _context.Versions.FirstOrDefault(x => x.UserId == userId && x.Number == version);
+		} 
+
 		#endregion
 	}
 }

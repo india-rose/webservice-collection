@@ -50,5 +50,6 @@ namespace WebAPI.Database
 		bool CanPushInVersion(long userId, long deviceId, long version);
 		List<Version> GetVersions(long userId);
 		List<Version> GetVersions(long userId, long startVersion);
+		Version GetVersion(long userId, long deviceId, long version);
 	}
 }

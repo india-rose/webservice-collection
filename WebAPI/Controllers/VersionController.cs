@@ -45,7 +45,7 @@ namespace WebAPI.Controllers
 		[HttpGet]
 		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
 		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
-		[SwaggerResponse(HttpStatusCode.OK, "List of all versions", typeof(RequestResult<List<VersionResponse>>))]
+		[SwaggerResponse(HttpStatusCode.OK, "List of all versions from the specified (excluded)", typeof(RequestResult<List<VersionResponse>>))]
 		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields", typeof(RequestResult))]
 		public HttpResponseMessage Versions([FromUri] string fromVersionNumber)
 		{
@@ -95,8 +95,9 @@ namespace WebAPI.Controllers
 		[HttpPost]
 		[SwaggerOperationFilter(typeof(UserAuthOperationFilter))]
 		[SwaggerOperationFilter(typeof(DeviceOperationFilter))]
-		[SwaggerResponse(HttpStatusCode.OK, "List of all versions", typeof(RequestResult<List<VersionResponse>>))]
+		[SwaggerResponse(HttpStatusCode.OK, "Closed version", typeof(RequestResult<List<VersionResponse>>))]
 		[SwaggerResponse(HttpStatusCode.BadRequest, "Missing fields", typeof(RequestResult))]
+		[SwaggerResponse(HttpStatusCode.Conflict, "Can not close an already closed version", typeof(RequestResult))]
 		public HttpResponseMessage CloseVersion([FromUri] string versionNumber)
 		{
 			long version;
@@ -115,7 +116,18 @@ namespace WebAPI.Controllers
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
 				}
 
-				Version v = database.CloseVersion(user.Id, device.Id, version);
+				Version v = database.GetVersion(user.Id, device.Id, version);
+				if (v == null)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
+				}
+
+				if (!v.IsOpen)
+				{
+					return Request.CreateErrorResponse(HttpStatusCode.Conflict, "Can not close an already closed version");
+				}
+
+				v = database.CloseVersion(user.Id, device.Id, version);
 				if (v == null)
 				{
 					return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Version not found");
